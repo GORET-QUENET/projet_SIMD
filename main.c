@@ -72,22 +72,22 @@ int main()
 	char *filename = malloc( 100 * sizeof(char));
 
 	/*  GENERATION DE LA MATRICE M  */
-	long *nrl = malloc( sizeof(long));
-	long *nrh = malloc( sizeof(long));
-	long *ncl = malloc( sizeof(long));
-	long *nch = malloc( sizeof(long));
+	long nrl; 
+	long nrh;
+	long ncl;
+	long nch;
 	long height, width;
 	char *buffer;
 	buffer = (char*) calloc(80, sizeof(char));
-	uint8 **m;
-	uint8 **ma;
-	uint8 **mFD;
-	uint8 **mSD;
-	uint8 **MSD;
-	uint8 **MSDa;
-	uint8 **OSD;
-	uint8 **VSD;
-	uint8 **VSDa;
+	uint8 **m; // image courante 
+	uint8 **ma; // matrice t-1
+	uint8 **mFD; // matrice après FD
+	uint8 **mSD; // matrice après SD
+	uint8 **MSD; // matrice Moyenne
+	uint8 **MSDa; // matrice moyenne à t-1
+	uint8 **OSD; // matrice différence
+	uint8 **VSD; // matrice Variance V
+	uint8 **VSDa; // matrice variance V à t-1
 	uint8 **tmp;
 	FILE *file;
 
@@ -107,23 +107,23 @@ int main()
 	width  = atoi(readitem(file, buffer));
   	height = atoi(readitem(file, buffer));
 
-	*nrl = 0;
-	*nrh = height - 1;
-	*ncl = 0;
-	*nch = width - 1;
+	nrl = 0;
+	nrh = height - 1;
+	ncl = 0;
+	nch = width - 1;
 
-	m = ui8matrix(*nrl, *nrh, *ncl, *nch);
+	m = ui8matrix(nrl, nrh, ncl, nch);
 	/* POUR CALCUL FD */
-	ma = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	mFD = ui8matrix(*nrl, *nrh, *ncl, *nch);
+	ma = ui8matrix(nrl, nrh, ncl, nch);
+	mFD = ui8matrix(nrl, nrh, ncl, nch);
 	/* POUR CALCUL SD */
-	mSD = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	MSD = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	MSDa = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	OSD = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	VSD = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	VSDa = ui8matrix(*nrl, *nrh, *ncl, *nch);
-	tmp = ui8matrix(*nrl, *nrh, *ncl, *nch);
+	mSD = ui8matrix(nrl, nrh, ncl, nch);
+	MSD = ui8matrix(nrl, nrh, ncl, nch);
+	MSDa = ui8matrix(nrl, nrh, ncl, nch);
+	OSD = ui8matrix(nrl, nrh, ncl, nch);
+	VSD = ui8matrix(nrl, nrh, ncl, nch);
+	VSDa = ui8matrix(nrl, nrh, ncl, nch);
+	tmp = ui8matrix(nrl, nrh, ncl, nch);
 
 	/*printf("nrl : %ld\n",*nrl);
 	printf("nrh : %ld\n",*nrh);
@@ -134,14 +134,14 @@ int main()
 	{
 		sprintf(filename,"hall/hall%06d.pgm", step);
 		printf("name : %s\n", filename);
-                CopyMatrice(*nrl, *nrh, *ncl, *nch, ma, m);
-		CopyMatrice(*nrl, *nrh, *ncl, *nch, MSDa, MSD);
-		CopyMatrice(*nrl, *nrh, *ncl, *nch, VSDa, VSD);
-		MLoadPGM_ui8matrix(filename, *nrl, *nrh, *ncl, *nch, m);
+                CopyMatrice(nrl, nrh, ncl, nch, ma, m);
+		CopyMatrice(nrl, nrh, ncl, nch, MSDa, MSD);
+		CopyMatrice(nrl, nrh, ncl, nch, VSDa, VSD);
+		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 		if(step == 0)
 		{
-			CopyMatrice(*nrl, *nrh, *ncl, *nch, MSD, m);
-			CopyValue(*nrl, *nrh, *ncl, *nch, VSD, Vmin);
+			CopyMatrice(nrl, nrh, ncl, nch, MSD, m);
+			CopyValue(nrl, nrh, ncl, nch, VSD, Vmin);
 		}	
 		else
 		{
@@ -154,17 +154,17 @@ int main()
 			sprintf(filename,"FD+morpho/hall%06d.pgm", i);
 			SavePGM_ui8matrix(mFD, *nrl, *nrh, *ncl, *nch, filename);*/
 
-			SD(*nrl, *nrh, *ncl, *nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
+			SD(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
 			sprintf(filename,"SD/hall%06d.pgm", step);
-			SavePGM_ui8matrix(mSD, *nrl, *nrh, *ncl, *nch, filename);
+			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 			
 
-			Ouverture3(*nrl, *nrh, *ncl, *nch, mSD, tmp);
-			Fermeture3(*nrl, *nrh, *ncl, *nch, mSD, tmp);
-			Ouverture5(*nrl, *nrh, *ncl, *nch, mSD, tmp);
-			Fermeture5(*nrl, *nrh, *ncl, *nch, mSD, tmp);
+			Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
+			Fermeture3(nrl, nrh, ncl, nch, mSD, tmp);
+			Ouverture5(nrl, nrh, ncl, nch, mSD, tmp);
+			Fermeture5(nrl, nrh, ncl, nch, mSD, tmp);
 			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
-			SavePGM_ui8matrix(mSD, *nrl, *nrh, *ncl, *nch, filename);
+			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}
 
