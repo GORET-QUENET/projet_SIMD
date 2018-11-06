@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h> 
 #include <string.h>
-#include <math.h> /* fabs */
+#include <math.h>
 
 #include "nrdef.h"
 #include "vnrdef.h"
