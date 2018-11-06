@@ -43,14 +43,16 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 		{
 			if(MSDa[i][j] < m[i][j] )
 				MSD[i][j] = MSDa[i][j] + 1;
-			if(MSDa[i][j] > m[i][j] )
+			else if(MSDa[i][j] > m[i][j] )
 				MSD[i][j] = MSDa[i][j] - 1;
+			else
+				MSD[i][j] = MSDa[i][j];
 
 			OSD[i][j] = MSD[i][j] - m[i][j];
 
-			if(VSDa[i][j] < N * OSD[i][j])
+			if(VSDa[i][j] < (N * OSD[i][j]))
 				VSD[i][j] = VSDa[i][j] + 1;
-			else if(VSDa[i][j] > N * OSD[i][j])
+			else if(VSDa[i][j] > (N * OSD[i][j]))
 				VSD[i][j] = VSDa[i][j] - 1;
 			else
 				VSD[i][j] = VSDa[i][j];
@@ -92,8 +94,6 @@ int main()
 	FILE *file;
 
 	file = fopen("hall/hall000000.pgm","rb");
-
-	printf("%d %d\n",(255 & 255), (255 | 0));
 	
 	if (file==NULL)
 		nrerror("ouverture du fichier impossible\n");
@@ -159,11 +159,12 @@ int main()
 			SD(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
-
+			
 			Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Ouverture5(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture5(nrl, nrh, ncl, nch, mSD, tmp);
+			
 			
 			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);

@@ -33,17 +33,13 @@ void CopyValue(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val)
 void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 1; i < nrh - 1; i+=3)
+	for(int i = nrl + 1; i < nrh - 1; i++)
 	{
-		for(int j = ncl + 1; j < nch - 1; j+=3)
+		for(int j = ncl + 1; j < nch - 1; j++)
 		{
-			for(int k = -1; k <= 1; k++)
-			{
-				for(int w = -1; w <= 1; w++)
-				{
-					tmp[i+k][j+w] = m[i+k][j+w] & m[i][j];
-				}
-			}
+			tmp[i][j] = m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1];
+			tmp[i][j]&= m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1];
+			tmp[i][j]&= m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1];
 		}
 	}
 	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
@@ -53,17 +49,15 @@ void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 2; i < nrh - 2; i+=5)
+	for(int i = nrl + 2; i < nrh - 2; i++)
 	{
-		for(int j = ncl + 2; j < nch - 2; j+=5)
+		for(int j = ncl + 2; j < nch - 2; j++)
 		{
-			for(int k = -2; k <= 2; k++)
-			{
-				for(int w = -2; w <= 2; w++)
-				{
-					tmp[i+k][j+w] = m[i+k][j+w] & m[i][j];
-				}
-			}
+			tmp[i][j] = m[i-2][j-2] & m[i-2][j-1] & m[i-2][j+0] & m[i-2][j+1] & m[i-2][j+2];
+			tmp[i][j]&= m[i-1][j-2] & m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1] & m[i-1][j+2];
+			tmp[i][j]&= m[i+0][j-2] & m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1] & m[i+0][j+2];
+			tmp[i][j]&= m[i+1][j-2] & m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1] & m[i+1][j+2];
+			tmp[i][j]&= m[i+2][j-2] & m[i+2][j-1] & m[i+2][j+0] & m[i+2][j+1] & m[i+2][j+2];
 		}
 	}
 	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
@@ -73,17 +67,13 @@ void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 1; i < nrh - 1; i+=3)
+	for(int i = nrl + 1; i < nrh - 1; i++)
 	{
-		for(int j = ncl + 1; j < nch - 1; j+=3)
+		for(int j = ncl + 1; j < nch - 1; j++)
 		{
-			for(int k = -1; k <= 1; k++)
-			{
-				for(int w = -1; w <= 1; w++)
-				{
-					tmp[i+k][j+w] = m[i+k][j+w] | m[i][j];
-				}
-			}
+			tmp[i][j] = m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1];
+			tmp[i][j]|= m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1];
+			tmp[i][j]|= m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1];
 		}
 	}
 	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
@@ -93,17 +83,15 @@ void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Dilatation5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 2; i < nrh - 2; i+=5)
+	for(int i = nrl + 2; i < nrh - 2; i++)
 	{
-		for(int j = ncl + 2; j < nch - 2; j+=5)
+		for(int j = ncl + 2; j < nch - 2; j++)
 		{
-			for(int k = -2; k <= 2; k++)
-			{
-				for(int w = -2; w <= 2; w++)
-				{
-					tmp[i+k][j+w] = m[i+k][j+w] | m[i][j];
-				}
-			}
+			tmp[i][j] = m[i-2][j-2] | m[i-2][j-1] | m[i-2][j+0] | m[i-2][j+1] | m[i-2][j+2];
+			tmp[i][j]|= m[i-1][j-2] | m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1] | m[i-1][j+2];
+			tmp[i][j]|= m[i+0][j-2] | m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1] | m[i+0][j+2];
+			tmp[i][j]|= m[i+1][j-2] | m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1] | m[i+1][j+2];
+			tmp[i][j]|= m[i+2][j-2] | m[i+2][j-1] | m[i+2][j+0] | m[i+2][j+1] | m[i+2][j+2];
 		}
 	}
 	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
