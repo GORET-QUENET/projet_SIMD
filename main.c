@@ -159,12 +159,12 @@ int main()
 			SD(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
-			
 
 			Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Ouverture5(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture5(nrl, nrh, ncl, nch, mSD, tmp);
+			
 			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
