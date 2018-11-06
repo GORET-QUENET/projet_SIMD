@@ -41,10 +41,7 @@ void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			{
 				for(int w = -1; w <= 1; w++)
 				{
-					if(m[i][j] == 0)
-						tmp[i+k][j+w] = 0;
-					else
-						tmp[i+k][j+w] = m[i+k][j+w];
+					tmp[i+k][j+w] = m[i+k][j+w] & m[i][j];
 				}
 			}
 		}
@@ -64,10 +61,7 @@ void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			{
 				for(int w = -2; w <= 2; w++)
 				{
-					if(m[i][j] == 0)
-						tmp[i+k][j+w] = 0;
-					else
-						tmp[i+k][j+w] = m[i+k][j+w];
+					tmp[i+k][j+w] = m[i+k][j+w] & m[i][j];
 				}
 			}
 		}
@@ -87,10 +81,7 @@ void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			{
 				for(int w = -1; w <= 1; w++)
 				{
-					if(m[i][j] == 255)
-						tmp[i+k][j+w] = 255;
-					else
-						tmp[i+k][j+w] = m[i+k][j+w];
+					tmp[i+k][j+w] = m[i+k][j+w] | m[i][j];
 				}
 			}
 		}
@@ -110,10 +101,7 @@ void Dilatation5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			{
 				for(int w = -2; w <= 2; w++)
 				{
-					if(m[i][j] == 255)
-						tmp[i+k][j+w] = 255;
-					else
-						tmp[i+k][j+w] = m[i+k][j+w];
+					tmp[i+k][j+w] = m[i+k][j+w] | m[i][j];
 				}
 			}
 		}

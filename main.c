@@ -92,6 +92,8 @@ int main()
 	FILE *file;
 
 	file = fopen("hall/hall000000.pgm","rb");
+
+	printf("%d %d\n",(255 & 255), (255 | 0));
 	
 	if (file==NULL)
 		nrerror("ouverture du fichier impossible\n");
