@@ -33,9 +33,9 @@ void CopyValue(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val)
 void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 1; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl + 1; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			tmp[i][j] = m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1];
 			tmp[i][j]&= m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1];
@@ -49,9 +49,9 @@ void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 2; i < nrh - 1; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl + 2; j < nch - 1; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			tmp[i][j] = m[i-2][j-2] & m[i-2][j-1] & m[i-2][j+0] & m[i-2][j+1] & m[i-2][j+2];
 			tmp[i][j]&= m[i-1][j-2] & m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1] & m[i-1][j+2];
@@ -67,9 +67,9 @@ void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 1; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl + 1; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			tmp[i][j] = m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1];
 			tmp[i][j]|= m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1];
@@ -83,9 +83,9 @@ void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Dilatation5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	for(int i = nrl + 2; i < nrh - 1; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl + 2; j < nch - 1; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			tmp[i][j] = m[i-2][j-2] | m[i-2][j-1] | m[i-2][j+0] | m[i-2][j+1] | m[i-2][j+2];
 			tmp[i][j]|= m[i-1][j-2] | m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1] | m[i-1][j+2];

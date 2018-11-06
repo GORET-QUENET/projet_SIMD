@@ -115,18 +115,18 @@ int main()
 	ncl = 0;
 	nch = width - 1;
 
-	m = ui8matrix(nrl, nrh, ncl, nch);
+	m = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/* POUR CALCUL FD */
-	ma = ui8matrix(nrl, nrh, ncl, nch);
-	mFD = ui8matrix(nrl, nrh, ncl, nch);
+	ma = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	mFD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/* POUR CALCUL SD */
-	mSD = ui8matrix(nrl, nrh, ncl, nch);
-	MSD = ui8matrix(nrl, nrh, ncl, nch);
-	MSDa = ui8matrix(nrl, nrh, ncl, nch);
-	OSD = ui8matrix(nrl, nrh, ncl, nch);
-	VSD = ui8matrix(nrl, nrh, ncl, nch);
-	VSDa = ui8matrix(nrl, nrh, ncl, nch);
-	tmp = ui8matrix(nrl, nrh, ncl, nch);
+	mSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	MSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	MSDa = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	OSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	VSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	VSDa = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 
 	/*printf("nrl : %ld\n",*nrl);
 	printf("nrh : %ld\n",*nrh);
