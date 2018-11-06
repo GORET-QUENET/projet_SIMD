@@ -6,6 +6,7 @@
 #include <math.h> /* fabs */
 
 #include "nrdef.h"
+#include "vnrdef.h"
 #include "nrutil.h"
 #include "morpho.h"
 
