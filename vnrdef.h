@@ -9,7 +9,7 @@
 #ifndef __V_NR_DEF_H__
 #define __V_NR_DEF_H__
 
-#pragma message("  include  vnrdef.h")
+//#pragma message("  include  vnrdef.h")
 
 #ifdef __cplusplus
 #pragma message ("C++")

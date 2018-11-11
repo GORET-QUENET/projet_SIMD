@@ -4,10 +4,12 @@
 #include <ctype.h> 
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #include "nrdef.h"
 #include "vnrdef.h"
 #include "nrutil.h"
+#include "vnrutil.h"
 #include "morpho.h"
 
 #define NBFRAME 300
@@ -36,6 +38,135 @@ void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **m
 
 /*---------------------------------------------------------------------------------------------------------------------------------------*/
 void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **MSD, uint8 **MSDa, uint8 **OSD, uint8 **VSD, uint8 **VSDa)
+/*---------------------------------------------------------------------------------------------------------------------------------------*/
+{
+	vuint8 vm, vmSD, vMSD, vMSDa, vOSD, vVSD, vVSDa, cmpl, cmpg;
+	vuint8 one, vN, vVmax, vVmin, vblanc, vnoir;
+
+	one = init_vuint8(1);
+	vN = init_vuint8(N);
+	vVmax = init_vuint8(Vmax);
+	vVmin = init_vuint8(Vmin);
+	vblanc = init_vuint8(255);
+	vnoir = init_vuint8(0);
+
+	vuint8 vmSD4;
+	vuint8 vMSD4;
+	vuint8 vVSD4;
+
+	for(int i = nrl; i < nrh; i++)
+	{
+		for(int j = ncl; j < nch; j+=16)
+		{
+			/*vm = init_vuint8(m[i][j+0]);
+			vMSDa = init_vuint8(MSDa[i][j+0]);
+			vVSDa = init_vuint8(VSDa[i][j]);*/
+			vm = init_vuint8_all(m[i][j+0],m[i][j+1],m[i][j+2],m[i][j+3],
+					     m[i][j+4],m[i][j+5],m[i][j+6],m[i][j+7],
+					     m[i][j+8],m[i][j+9],m[i][j+10],m[i][j+11],
+					     m[i][j+12],m[i][j+13],m[i][j+14],m[i][j+15]);
+			vMSDa = init_vuint8_all(MSDa[i][j+0],MSDa[i][j+1],MSDa[i][j+2],MSDa[i][j+3],
+						MSDa[i][j+4],MSDa[i][j+5],MSDa[i][j+6],MSDa[i][j+7],
+						MSDa[i][j+8],MSDa[i][j+9],MSDa[i][j+10],MSDa[i][j+11],
+						MSDa[i][j+12],MSDa[i][j+13],MSDa[i][j+14],MSDa[i][j+15]);
+			vVSDa = init_vuint8_all(VSDa[i][j+0],VSDa[i][j+1],VSDa[i][j+2],VSDa[i][j+3],
+						VSDa[i][j+4],VSDa[i][j+5],VSDa[i][j+6],VSDa[i][j+7],
+						VSDa[i][j+8],VSDa[i][j+9],VSDa[i][j+10],VSDa[i][j+11],
+						VSDa[i][j+12],VSDa[i][j+13],VSDa[i][j+14],VSDa[i][j+15]);
+
+			cmpl = _mm_cmplt_epi8(vMSDa, vm);	//if(vMSDa < vm)
+			cmpg = _mm_cmpgt_epi8(vMSDa, vm);	//if(vMSDa > vm)
+
+
+			vMSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vMSDa,one)),			//if(vMSDa < vm ) -> vMSD = vMSDa + 1
+			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vMSDa,one)),	//else if(vMSDa > vm ) -> vMSD = vMSDa - 1
+			       _mm_andnot_si128(cmpg, vMSDa))));						//else -> vMSD = vMSDa
+
+			vOSD = _mm_sub_epi8(vMSD, vm);
+
+			cmpl = _mm_cmplt_epi8(vVSDa, _mm_mul_epu32(vOSD, vN));	//if(vVSDa < vOSD * vN)
+			cmpg = _mm_cmpgt_epi8(vVSDa, _mm_mul_epu32(vOSD, vN));	//if(vVSDa > vOSD * vN)
+
+			vVSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vVSDa,one)),			//if(vVSDa < vOSD * vN) -> vVSD = vVSDa + 1
+			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vVSDa,one)),	//else if(vVSDa > vOSD * vN) -> vVSD = vVSDa - 1
+			       _mm_andnot_si128(cmpg, vVSDa))));						//else -> vVSD = vVSDa
+
+			cmpl = _mm_cmplt_epi8(vVSD, vVmax);		//if(vVSD < vVmax)
+			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVSD),		//if(vVSD < vVmax) -> vVSD = vVSD
+			       _mm_andnot_si128(cmpl, vVmax));		//else -> vVSD = vVmax
+			cmpl = _mm_cmplt_epi8(vVSD, vVmin);		//if(vVSD < vVmin)
+			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVmin),	//if(vVSD < vVmin) -> vVSD = vVmin
+			       _mm_andnot_si128(cmpl, vVSD));		//else -> vVSD = vVSD
+
+
+			cmpl = _mm_cmplt_epi8(vOSD, vVSD);		//if(vOSD < vVSD)
+			vmSD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),	//if(vOSD < vVSD) -> vmSD = 0
+			       _mm_andnot_si128(cmpl, vblanc));		//else -> vmSD = 255
+
+			_mm_store_si128( &vmSD4, vmSD);
+			_mm_store_si128( &vMSD4, vMSD);
+			_mm_store_si128( &vVSD4, vVSD);
+
+			
+
+			mSD[i][j+0] = vmSD4[0];
+			mSD[i][j+1] = vmSD4[1];
+			mSD[i][j+2] = vmSD4[2];
+			mSD[i][j+3] = vmSD4[3];
+			mSD[i][j+4] = vmSD4[4];
+			mSD[i][j+5] = vmSD4[5];
+			mSD[i][j+6] = vmSD4[6];
+			mSD[i][j+7] = vmSD4[7];
+			mSD[i][j+8] = vmSD4[8];
+			mSD[i][j+9] = vmSD4[9];
+			mSD[i][j+10] = vmSD4[10];
+			mSD[i][j+11] = vmSD4[11];
+			mSD[i][j+12] = vmSD4[12];
+			mSD[i][j+13] = vmSD4[13];
+			mSD[i][j+14] = vmSD4[14];
+			mSD[i][j+15] = vmSD4[15];
+
+
+			MSD[i][j+0] = vMSD4[0];
+			MSD[i][j+1] = vMSD4[1];
+			MSD[i][j+2] = vMSD4[2];
+			MSD[i][j+3] = vMSD4[3];
+			MSD[i][j+4] = vMSD4[4];
+			MSD[i][j+5] = vMSD4[5];
+			MSD[i][j+6] = vMSD4[6];
+			MSD[i][j+7] = vMSD4[7];
+			MSD[i][j+8] = vMSD4[8];
+			MSD[i][j+9] = vMSD4[9];
+			MSD[i][j+10] = vMSD4[10];
+			MSD[i][j+11] = vMSD4[11];
+			MSD[i][j+12] = vMSD4[12];
+			MSD[i][j+13] = vMSD4[13];
+			MSD[i][j+14] = vMSD4[14];
+			MSD[i][j+15] = vMSD4[15];
+
+			VSD[i][j+0] = vVSD4[0];
+			VSD[i][j+1] = vVSD4[1];
+			VSD[i][j+2] = vVSD4[2];
+			VSD[i][j+3] = vVSD4[3];
+			VSD[i][j+4] = vVSD4[4];
+			VSD[i][j+5] = vVSD4[5];
+			VSD[i][j+6] = vVSD4[6];
+			VSD[i][j+7] = vVSD4[7];
+			VSD[i][j+8] = vVSD4[8];
+			VSD[i][j+9] = vVSD4[9];
+			VSD[i][j+10] = vVSD4[10];
+			VSD[i][j+11] = vVSD4[11];
+			VSD[i][j+12] = vVSD4[12];
+			VSD[i][j+13] = vVSD4[13];
+			VSD[i][j+14] = vVSD4[14];
+			VSD[i][j+15] = vVSD4[15];
+
+		}
+	}
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------*/
+void SEQ_SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **MSD, uint8 **MSDa, uint8 **OSD, uint8 **VSD, uint8 **VSDa)
 /*---------------------------------------------------------------------------------------------------------------------------------------*/
 {
 	for(int i = nrl; i < nrh; i++)
@@ -68,7 +199,6 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 	}
 }
 
-
 void test_visage()
 {
 	long nrl; 
@@ -94,6 +224,8 @@ void test_visage()
 int main()
 {
 	char *filename = malloc( 100 * sizeof(char));
+	float t;
+	clock_t t1, t2;
 
 	/*  GENERATION DE LA MATRICE M  */
 	long nrl; 
@@ -154,10 +286,11 @@ int main()
 	printf("ncl : %ld\n",*ncl);
 	printf("nch : %ld\n",*nch);*/
 	/* ########################## */
+	t1 = clock();
 	for(int step = 0; step < NBFRAME; step++)
 	{
 		sprintf(filename,"hall/hall%06d.pgm", step);
-		printf("name : %s\n", filename);
+		//printf("name : %s\n", filename);
                 CopyMatrice(nrl, nrh, ncl, nch, ma, m);
 		CopyMatrice(nrl, nrh, ncl, nch, MSDa, MSD);
 		CopyMatrice(nrl, nrh, ncl, nch, VSDa, VSD);
@@ -182,17 +315,19 @@ int main()
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 			
-			Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
+			/*Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture3(nrl, nrh, ncl, nch, mSD, tmp);
 			Ouverture5(nrl, nrh, ncl, nch, mSD, tmp);
 			Fermeture5(nrl, nrh, ncl, nch, mSD, tmp);
 			
 			
 			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
-			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
+			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);*/
 		}
 	}
-	test_visage();
-	printf("end\n");
+	t2 = clock();
+	//test_visage();
+	t = (float)(t2 - t1) / CLOCKS_PER_SEC;
+	printf("end after %fs\n", t);
 	return 0;
 }
