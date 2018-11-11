@@ -69,6 +69,33 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 }
 
 
+/**************************************************/
+/*     		  TESTS UNITAIRES		  */
+/**************************************************/
+
+
+void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch){
+	for (uint8 i = nrl; i <= nrh; i++)
+		for (uint8 j = ncl; j <= nch; j++){
+			if (m[i][j] == 255)
+				m[i][j] = 0;
+			else if (m[i][j] == 0)
+				m[i][j] = 255;
+			else
+				printf("Error : grey value detected\n");
+		}
+}
+			
+void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch){
+        for (uint8 i = nrl; i <= nrh; i++){
+                for (uint8 j = ncl; j <= nch; j++)
+                                printf("%d\t", m[i][j]);
+		printf("\n");
+	}
+}
+
+
+
 void test_visage()
 {
 	long nrl; 
@@ -81,18 +108,26 @@ void test_visage()
 	char *filename = malloc( 100 * sizeof(char));
 	sprintf(filename,"test2.pgm");
 	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
-
+	
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 
+	inverser_matrice(m, nrl, nrh, ncl, nch);
+	afficher_matrice(m, nrl, nrh, ncl, nch);	
 	Erosion3(nrl, nrh, ncl, nch, m, tmp);
+	inverser_matrice(m, nrl, nrh, ncl, nch);
+	afficher_matrice(m, nrl, nrh, ncl, nch);
 	sprintf(filename,"test_erosion.pgm");
 	SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 }
 
+/**************************************************/
+/*             FIN DES TESTS UNITAIRES            */
+/**************************************************/
 
 
-int main()
+int main(int argc, char **argv)
 {
+	if (argc == 1){ // EXECUTION NORMALE DU PROGRAMME
 	char *filename = malloc( 100 * sizeof(char));
 
 	/*  GENERATION DE LA MATRICE M  */
@@ -192,7 +227,10 @@ int main()
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}
-	test_visage();
+	}
+	else{ // argc > 1, alors MODE TEST
+		test_visage();
+	}
 	printf("end\n");
 	return 0;
 }
