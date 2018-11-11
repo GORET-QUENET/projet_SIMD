@@ -69,6 +69,27 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 }
 
 
+void test_visage()
+{
+	long nrl; 
+	long nrh;
+	long ncl;
+	long nch;
+	uint8 **m; // image courante 
+	uint8 **tmp;
+
+	char *filename = malloc( 100 * sizeof(char));
+	sprintf(filename,"test2.pgm");
+	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
+
+	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+
+	Erosion3(nrl, nrh, ncl, nch, m, tmp);
+	sprintf(filename,"test_erosion.pgm");
+	SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
+}
+
+
 
 int main()
 {
@@ -171,7 +192,7 @@ int main()
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}
-
+	test_visage();
 	printf("end\n");
 	return 0;
 }
