@@ -12,11 +12,13 @@
 #include "vnrutil.h"
 #include "morpho.h"
 
+//Commande SSE : https://software.intel.com/sites/landingpage/IntrinsicsGuide/
+
 #define NBFRAME 300
 #define THETA 30
 #define N 3
-#define Vmax 254
-#define Vmin 1
+#define Vmax 150
+#define Vmin 50
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -41,26 +43,20 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 /*---------------------------------------------------------------------------------------------------------------------------------------*/
 {
 	vuint8 vm, vmSD, vMSD, vMSDa, vOSD, vVSD, vVSDa, cmpl, cmpg;
-	vuint8 one, vN, vVmax, vVmin, vblanc, vnoir;
+	vuint8 one, vVmax, vVmin, vblanc, vnoir, NvOSD;
 
 	one = init_vuint8(1);
-	vN = init_vuint8(N);
 	vVmax = init_vuint8(Vmax);
 	vVmin = init_vuint8(Vmin);
 	vblanc = init_vuint8(255);
 	vnoir = init_vuint8(0);
 
-	vuint8 vmSD4;
-	vuint8 vMSD4;
-	vuint8 vVSD4;
+	vuint8 vmSD16, vMSD16, vVSD16;
 
 	for(int i = nrl; i < nrh; i++)
 	{
 		for(int j = ncl; j < nch; j+=16)
 		{
-			/*vm = init_vuint8(m[i][j+0]);
-			vMSDa = init_vuint8(MSDa[i][j+0]);
-			vVSDa = init_vuint8(VSDa[i][j]);*/
 			vm = init_vuint8_all(m[i][j+0],m[i][j+1],m[i][j+2],m[i][j+3],
 					     m[i][j+4],m[i][j+5],m[i][j+6],m[i][j+7],
 					     m[i][j+8],m[i][j+9],m[i][j+10],m[i][j+11],
@@ -78,21 +74,22 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 			cmpg = _mm_cmpgt_epi8(vMSDa, vm);	//if(vMSDa > vm)
 
 
-			vMSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vMSDa,one)),			//if(vMSDa < vm ) -> vMSD = vMSDa + 1
+			vMSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vMSDa,one)),				//if(vMSDa < vm ) -> vMSD = vMSDa + 1
 			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vMSDa,one)),	//else if(vMSDa > vm ) -> vMSD = vMSDa - 1
-			       _mm_andnot_si128(cmpg, vMSDa))));						//else -> vMSD = vMSDa
+			       _mm_andnot_si128(cmpg, vMSDa))));							//else -> vMSD = vMSDa
 
 			vOSD = _mm_sub_epi8(vMSD, vm);
 
-			cmpl = _mm_cmplt_epi8(vVSDa, _mm_mul_epu32(vOSD, vN));	//if(vVSDa < vOSD * vN)
-			cmpg = _mm_cmpgt_epi8(vVSDa, _mm_mul_epu32(vOSD, vN));	//if(vVSDa > vOSD * vN)
+			NvOSD = _mm_add_epi8(vOSD,_mm_add_epi8(vOSD,vOSD));
+			cmpl = _mm_cmplt_epi8(vVSDa, NvOSD);	//if(vVSDa < vOSD * 3)
+			cmpg = _mm_cmpgt_epi8(vVSDa, NvOSD);	//if(vVSDa > vOSD * 3)
 
-			vVSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vVSDa,one)),			//if(vVSDa < vOSD * vN) -> vVSD = vVSDa + 1
+			vVSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vVSDa,one)),				//if(vVSDa < vOSD * vN) -> vVSD = vVSDa + 1
 			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vVSDa,one)),	//else if(vVSDa > vOSD * vN) -> vVSD = vVSDa - 1
-			       _mm_andnot_si128(cmpg, vVSDa))));						//else -> vVSD = vVSDa
+			       _mm_andnot_si128(cmpg, vVSDa))));							//else -> vVSD = vVSDa
 
 			cmpl = _mm_cmplt_epi8(vVSD, vVmax);		//if(vVSD < vVmax)
-			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVSD),		//if(vVSD < vVmax) -> vVSD = vVSD
+			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVSD),	//if(vVSD < vVmax) -> vVSD = vVSD
 			       _mm_andnot_si128(cmpl, vVmax));		//else -> vVSD = vVmax
 			cmpl = _mm_cmplt_epi8(vVSD, vVmin);		//if(vVSD < vVmin)
 			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVmin),	//if(vVSD < vVmin) -> vVSD = vVmin
@@ -103,64 +100,63 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 			vmSD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),	//if(vOSD < vVSD) -> vmSD = 0
 			       _mm_andnot_si128(cmpl, vblanc));		//else -> vmSD = 255
 
-			_mm_store_si128( &vmSD4, vmSD);
-			_mm_store_si128( &vMSD4, vMSD);
-			_mm_store_si128( &vVSD4, vVSD);
+			_mm_store_si128( &vmSD16, vmSD);
+			_mm_store_si128( &vMSD16, vMSD);
+			_mm_store_si128( &vVSD16, vVSD);
 
-			
+			//printf("%d, %d, %d\n", sizeof(vmSD16[0]), sizeof(vuint8), sizeof(unsigned char));
 
-			mSD[i][j+0] = vmSD4[0];
-			mSD[i][j+1] = vmSD4[1];
-			mSD[i][j+2] = vmSD4[2];
-			mSD[i][j+3] = vmSD4[3];
-			mSD[i][j+4] = vmSD4[4];
-			mSD[i][j+5] = vmSD4[5];
-			mSD[i][j+6] = vmSD4[6];
-			mSD[i][j+7] = vmSD4[7];
-			mSD[i][j+8] = vmSD4[8];
-			mSD[i][j+9] = vmSD4[9];
-			mSD[i][j+10] = vmSD4[10];
-			mSD[i][j+11] = vmSD4[11];
-			mSD[i][j+12] = vmSD4[12];
-			mSD[i][j+13] = vmSD4[13];
-			mSD[i][j+14] = vmSD4[14];
-			mSD[i][j+15] = vmSD4[15];
+			mSD[i][j+0] = (vmSD16[0] >> 56) & 255;
+			mSD[i][j+1] = (vmSD16[0] >> 48) & 255;
+			mSD[i][j+2] = (vmSD16[0] >> 40) & 255;
+			mSD[i][j+3] = (vmSD16[0] >> 32) & 255;
+			mSD[i][j+4] = (vmSD16[0] >> 24) & 255;
+			mSD[i][j+5] = (vmSD16[0] >> 16) & 255;
+			mSD[i][j+6] = (vmSD16[0] >> 8) & 255;
+			mSD[i][j+7] = (vmSD16[0] >> 0) & 255;
+			mSD[i][j+8] = (vmSD16[1] >> 56) & 255;
+			mSD[i][j+9] = (vmSD16[1] >> 48) & 255;
+			mSD[i][j+10] = (vmSD16[1] >> 40) & 255;
+			mSD[i][j+11] = (vmSD16[1] >> 32) & 255;
+			mSD[i][j+12] = (vmSD16[1] >> 24) & 255;
+			mSD[i][j+13] = (vmSD16[1] >> 16) & 255;
+			mSD[i][j+14] = (vmSD16[1] >> 8) & 255;
+			mSD[i][j+15] = (vmSD16[1] >> 0) & 255;
 
 
-			MSD[i][j+0] = vMSD4[0];
-			MSD[i][j+1] = vMSD4[1];
-			MSD[i][j+2] = vMSD4[2];
-			MSD[i][j+3] = vMSD4[3];
-			MSD[i][j+4] = vMSD4[4];
-			MSD[i][j+5] = vMSD4[5];
-			MSD[i][j+6] = vMSD4[6];
-			MSD[i][j+7] = vMSD4[7];
-			MSD[i][j+8] = vMSD4[8];
-			MSD[i][j+9] = vMSD4[9];
-			MSD[i][j+10] = vMSD4[10];
-			MSD[i][j+11] = vMSD4[11];
-			MSD[i][j+12] = vMSD4[12];
-			MSD[i][j+13] = vMSD4[13];
-			MSD[i][j+14] = vMSD4[14];
-			MSD[i][j+15] = vMSD4[15];
+			MSD[i][j+0] = (vMSD16[0] >> 56) & 255;
+			MSD[i][j+1] = (vMSD16[0] >> 48) & 255;
+			MSD[i][j+2] = (vMSD16[0] >> 40) & 255;
+			MSD[i][j+3] = (vMSD16[0] >> 32) & 255;
+			MSD[i][j+4] = (vMSD16[0] >> 24) & 255;
+			MSD[i][j+5] = (vMSD16[0] >> 16) & 255;
+			MSD[i][j+6] = (vMSD16[0] >> 8) & 255;
+			MSD[i][j+7] = (vMSD16[0] >> 0) & 255;
+			MSD[i][j+8] = (vMSD16[1] >> 56) & 255;
+			MSD[i][j+9] = (vMSD16[1] >> 48) & 255;
+			MSD[i][j+10] = (vMSD16[1] >> 40) & 255;
+			MSD[i][j+11] = (vMSD16[1] >> 32) & 255;
+			MSD[i][j+12] = (vMSD16[1] >> 24) & 255;
+			MSD[i][j+13] = (vMSD16[1] >> 16) & 255;
+			MSD[i][j+14] = (vMSD16[1] >> 8) & 255;
+			MSD[i][j+15] = (vMSD16[1] >> 0) & 255;
 
-			VSD[i][j+0] = vVSD4[0];
-			VSD[i][j+1] = vVSD4[1];
-			VSD[i][j+2] = vVSD4[2];
-			VSD[i][j+3] = vVSD4[3];
-			VSD[i][j+4] = vVSD4[4];
-			VSD[i][j+5] = vVSD4[5];
-			VSD[i][j+6] = vVSD4[6];
-			VSD[i][j+7] = vVSD4[7];
-			VSD[i][j+8] = vVSD4[8];
-			VSD[i][j+9] = vVSD4[9];
-			VSD[i][j+10] = vVSD4[10];
-			VSD[i][j+11] = vVSD4[11];
-			VSD[i][j+12] = vVSD4[12];
-			VSD[i][j+13] = vVSD4[13];
-			VSD[i][j+14] = vVSD4[14];
-			VSD[i][j+15] = vVSD4[15];
-
+			VSD[i][j+0] = (vVSD16[0] >> 56) & 255;
+			VSD[i][j+1] = (vVSD16[0] >> 48) & 255;
+			VSD[i][j+2] = (vVSD16[0] >> 40) & 255;
+			VSD[i][j+3] = (vVSD16[0] >> 36) & 255;
+			VSD[i][j+4] = (vVSD16[0] >> 24) & 255;
+			VSD[i][j+5] = (vVSD16[0] >> 16) & 255;
+			VSD[i][j+6] = (vVSD16[0] >> 8) & 255;
+			VSD[i][j+7] = (vVSD16[0] >> 0) & 255;
+			VSD[i][j+8] = (vVSD16[1] >> 56) & 255;
+			VSD[i][j+9] = (vVSD16[1] >> 48) & 255;
+			VSD[i][j+10] = (vVSD16[1] >> 40) & 255;
+			VSD[i][j+11] = (vVSD16[1] >> 36) & 255;
+			VSD[i][j+12] = (vVSD16[1] >> 24) & 255;
+			VSD[i][j+13] = (vVSD16[1] >> 16) & 255;
+			VSD[i][j+14] = (vVSD16[1] >> 8) & 255;
+			VSD[i][j+15] = (vVSD16[1] >> 0) & 255;
 		}
 	}
 }
