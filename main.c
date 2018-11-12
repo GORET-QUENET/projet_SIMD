@@ -245,6 +245,12 @@ void SEQ_SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint
 /*     		  TESTS UNITAIRES		  */
 /**************************************************/
 
+int64_t clocktime() {
+   struct timeval full_time;
+
+   gettimeofday(&full_time, NULL);
+   return (int64_t) ((full_time.tv_usec + full_time.tv_sec * 1000000) / 1000);
+}
 
 void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
@@ -272,59 +278,70 @@ void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 }
 
 
-void test_visage(int nb)
+void test_visage()
 {
 	long nrl; 
 	long nrh;
 	long ncl;
 	long nch;
+	//int64_t end;
+	//int64_t start;
 	uint8 **m; // image courante 
 	uint8 **tmp;
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
-	for (i = 0; i < nb; i++){
+	for (i = 0; i < 100; i++){
 		sprintf(filename,"test2.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 		inverser_matrice(m, nrl, nrh, ncl, nch);
-		afficher_matrice(m, nrl, nrh, ncl, nch);
+		//afficher_matrice(m, nrl, nrh, ncl, nch);
 		switch(i){
-		case 0: 	
+		case 0: 
+			//start = clocktime();	
 			Erosion3(nrl, nrh, ncl, nch, m, tmp);
-			sprintf(filename,"test_erosion3.pgm");
+			//end = clocktime();
+			//printf("Erosion3_seq completed   %8lld ms\n", end - start);
+			sprintf(filename,"test/erosion3.pgm");
 			break;
 		case 1:
 			Dilatation3(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"test_dilatation3.pgm");
+                	sprintf(filename,"test/dilatation3.pgm");
                 	break;
 		case 2:
 			Erosion5(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"test_erosion5.pgm");
+                	sprintf(filename,"test/erosion5.pgm");
                		break;
 		case 3:
 			Dilatation5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_dilatation5.pgm");
+                        sprintf(filename,"test/dilatation5.pgm");
                         break;
 		case 4:
+			//start = clocktime();
                         Fermeture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_fermeture3.pgm");
+			//end = clocktime();
+			//printf("Fermeture3_seq completed   %8lld ms\n", end - start);
+                        sprintf(filename,"test/fermeture3.pgm");
                         break;
 		case 5:
                         Fermeture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_fermeture5.pgm");
+                        sprintf(filename,"test/fermeture5.pgm");
                         break;
 		case 6:
                         Ouverture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_ouverture3.pgm");
+                        sprintf(filename,"test/ouverture3.pgm");
                         break;
 		case 7:
+			//start = clocktime();
                         Ouverture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_ouverture5.pgm");
+			//end = clocktime();
+                        //printf("Ouverture5_seq completed   %8lld ms\n", end - start);
+			sprintf(filename,"test/ouverture5.pgm");
                         break;
 		default:
 			return;
 		}	
-		afficher_matrice(m, nrl, nrh, ncl, nch);
+		//afficher_matrice(m, nrl, nrh, ncl, nch);
         	inverser_matrice(m, nrl, nrh, ncl, nch);	
 		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 	}
@@ -449,8 +466,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{ // argc > 1, alors MODE TEST
-		int nb = atoi(argv[1]);
-		test_visage(nb);
+		test_visage();
 		printf("end\n");
 	}
 	
