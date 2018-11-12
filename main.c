@@ -271,7 +271,7 @@ void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 }
 
 
-void test_visage()
+void test_visage(int nb)
 {
 	long nrl; 
 	long nrh;
@@ -281,7 +281,7 @@ void test_visage()
 	uint8 **tmp;
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < nb; i++){
 		sprintf(filename,"test2.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
@@ -447,7 +447,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{ // argc > 1, alors MODE TEST
-		test_visage();
+		int nb = atoi(argv[1]);
+		test_visage(nb);
 		printf("end\n");
 	}
 	
