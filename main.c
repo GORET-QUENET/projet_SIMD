@@ -18,12 +18,62 @@
 #define THETA 30
 #define N 3
 #define Vmax 254
-#define Vmin 5
+#define Vmin 4
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 /*--------------------------------------------------------------------------------*/
 void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **mFD)
+/*--------------------------------------------------------------------------------*/
+{
+	vuint8 vm, vma, vmFD, cmpl;
+	vuint8 vblanc, vnoir, vTHETA;
+
+	vblanc = _mm_set1_epi8(255);
+	vnoir = _mm_set1_epi8(0);
+	vTHETA = _mm_set1_epi8(THETA);
+
+	for(int i = nrl; i < nrh; i++)
+	{
+		for(int j = ncl; j < nch; j+=16)
+		{
+			vm = _mm_set_epi8(m[i][j+0 ],m[i][j+1 ],m[i][j+2 ],m[i][j+3 ],
+				          m[i][j+4 ],m[i][j+5 ],m[i][j+6 ],m[i][j+7 ],
+				          m[i][j+8 ],m[i][j+9 ],m[i][j+10],m[i][j+11],
+				          m[i][j+12],m[i][j+13],m[i][j+14],m[i][j+15]);
+			
+			vma = _mm_set_epi8(ma[i][j+0 ],ma[i][j+1 ],ma[i][j+2 ],ma[i][j+3 ],
+				           ma[i][j+4 ],ma[i][j+5 ],ma[i][j+6 ],ma[i][j+7 ],
+				           ma[i][j+8 ],ma[i][j+9 ],ma[i][j+10],ma[i][j+11],
+				           ma[i][j+12],ma[i][j+13],ma[i][j+14],ma[i][j+15]);
+
+			cmpl = _mm_cmplt_epi8(_mm_sub_epi8(vm,vma), vTHETA);	//if( vm - vma < vTHETA)
+			vmFD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),	//if( vm - vma < vTHETA) -> vmFD = 0
+			       _mm_andnot_si128(cmpl, vblanc));		//else -> vmFD = 255
+
+			mFD[i][j+15] = (vmFD[0] >> 0 ) & 255;
+			mFD[i][j+14] = (vmFD[0] >> 8 ) & 255;
+			mFD[i][j+13] = (vmFD[0] >> 16) & 255;
+			mFD[i][j+12] = (vmFD[0] >> 24) & 255;
+			mFD[i][j+11] = (vmFD[0] >> 32) & 255;
+			mFD[i][j+10] = (vmFD[0] >> 40) & 255;
+			mFD[i][j+9 ] = (vmFD[0] >> 48) & 255;
+			mFD[i][j+8 ] = (vmFD[0] >> 56) & 255;
+			mFD[i][j+7 ] = (vmFD[1] >> 0 ) & 255;
+			mFD[i][j+6 ] = (vmFD[1] >> 8 ) & 255;
+			mFD[i][j+5 ] = (vmFD[1] >> 16) & 255;
+			mFD[i][j+4 ] = (vmFD[1] >> 24) & 255;
+			mFD[i][j+3 ] = (vmFD[1] >> 32) & 255;
+			mFD[i][j+2 ] = (vmFD[1] >> 40) & 255;
+			mFD[i][j+1 ] = (vmFD[1] >> 48) & 255;
+			mFD[i][j+0 ] = (vmFD[1] >> 56) & 255;
+		}
+	}
+}
+
+
+/*--------------------------------------------------------------------------------*/
+void SEQ_FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **mFD)
 /*--------------------------------------------------------------------------------*/
 {
 	for(int i = nrl; i < nrh; i++)
