@@ -233,20 +233,53 @@ void test_visage()
 	long nch;
 	uint8 **m; // image courante 
 	uint8 **tmp;
-
+	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
-	sprintf(filename,"test2.pgm");
-	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
-	
-	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
-
-	inverser_matrice(m, nrl, nrh, ncl, nch);
-	afficher_matrice(m, nrl, nrh, ncl, nch);	
-	Erosion3(nrl, nrh, ncl, nch, m, tmp);
-	inverser_matrice(m, nrl, nrh, ncl, nch);
-	afficher_matrice(m, nrl, nrh, ncl, nch);
-	sprintf(filename,"test_erosion.pgm");
-	SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
+	for (i = 0; i < 8; i++){
+		sprintf(filename,"test2.pgm");
+		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
+		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+		inverser_matrice(m, nrl, nrh, ncl, nch);
+		//afficher_matrice(m, nrl, nrh, ncl, nch);
+		switch(i){
+		case 0: 	
+			Erosion3(nrl, nrh, ncl, nch, m, tmp);
+			sprintf(filename,"test_erosion3.pgm");
+			break;
+		case 1:
+			Dilatation3(nrl, nrh, ncl, nch, m, tmp);
+                	sprintf(filename,"test_dilatation3.pgm");
+                	break;
+		case 2:
+			Erosion5(nrl, nrh, ncl, nch, m, tmp);
+                	sprintf(filename,"test_erosion5.pgm");
+               		break;
+		case 3:
+			Dilatation5(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"test_dilatation5.pgm");
+                        break;
+		case 4:
+                        Fermeture3(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"test_fermeture3.pgm");
+                        break;
+		case 5:
+                        Fermeture5(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"test_fermeture5.pgm");
+                        break;
+		case 6:
+                        Ouverture3(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"test_ouverture3.pgm");
+                        break;
+		case 7:
+                        Ouverture5(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"test_ouverture5.pgm");
+                        break;
+		default:
+			return;
+		}	
+        	inverser_matrice(m, nrl, nrh, ncl, nch);	
+		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
+	}
 }
 
 /**************************************************/
