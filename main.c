@@ -17,8 +17,8 @@
 #define NBFRAME 300
 #define THETA 30
 #define N 3
-#define Vmax 150
-#define Vmin 50
+#define Vmax 254
+#define Vmin 5
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -45,30 +45,30 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 	vuint8 vm, vmSD, vMSD, vMSDa, vOSD, vVSD, vVSDa, cmpl, cmpg;
 	vuint8 one, vVmax, vVmin, vblanc, vnoir, NvOSD;
 
-	one = init_vuint8(1);
-	vVmax = init_vuint8(Vmax);
-	vVmin = init_vuint8(Vmin);
-	vblanc = init_vuint8(255);
-	vnoir = init_vuint8(0);
-
-	vuint8 vmSD16, vMSD16, vVSD16;
+	one = _mm_set1_epi8(1);
+	vVmax = _mm_set1_epi8(Vmax);
+	vVmin = _mm_set1_epi8(Vmin);
+	vblanc = _mm_set1_epi8(255);
+	vnoir = _mm_set1_epi8(0);
 
 	for(int i = nrl; i < nrh; i++)
 	{
 		for(int j = ncl; j < nch; j+=16)
 		{
-			vm = init_vuint8_all(m[i][j+0],m[i][j+1],m[i][j+2],m[i][j+3],
-					     m[i][j+4],m[i][j+5],m[i][j+6],m[i][j+7],
-					     m[i][j+8],m[i][j+9],m[i][j+10],m[i][j+11],
-					     m[i][j+12],m[i][j+13],m[i][j+14],m[i][j+15]);
-			vMSDa = init_vuint8_all(MSDa[i][j+0],MSDa[i][j+1],MSDa[i][j+2],MSDa[i][j+3],
-						MSDa[i][j+4],MSDa[i][j+5],MSDa[i][j+6],MSDa[i][j+7],
-						MSDa[i][j+8],MSDa[i][j+9],MSDa[i][j+10],MSDa[i][j+11],
-						MSDa[i][j+12],MSDa[i][j+13],MSDa[i][j+14],MSDa[i][j+15]);
-			vVSDa = init_vuint8_all(VSDa[i][j+0],VSDa[i][j+1],VSDa[i][j+2],VSDa[i][j+3],
-						VSDa[i][j+4],VSDa[i][j+5],VSDa[i][j+6],VSDa[i][j+7],
-						VSDa[i][j+8],VSDa[i][j+9],VSDa[i][j+10],VSDa[i][j+11],
-						VSDa[i][j+12],VSDa[i][j+13],VSDa[i][j+14],VSDa[i][j+15]);
+			vm = _mm_set_epi8(m[i][j+0 ],m[i][j+1 ],m[i][j+2 ],m[i][j+3 ],
+				          m[i][j+4 ],m[i][j+5 ],m[i][j+6 ],m[i][j+7 ],
+				          m[i][j+8 ],m[i][j+9 ],m[i][j+10],m[i][j+11],
+				          m[i][j+12],m[i][j+13],m[i][j+14],m[i][j+15]);
+
+			vMSDa = _mm_set_epi8(MSDa[i][j+0 ],MSDa[i][j+1 ],MSDa[i][j+2 ],MSDa[i][j+3 ],
+					     MSDa[i][j+4 ],MSDa[i][j+5 ],MSDa[i][j+6 ],MSDa[i][j+7 ],
+					     MSDa[i][j+8 ],MSDa[i][j+9 ],MSDa[i][j+10],MSDa[i][j+11],
+					     MSDa[i][j+12],MSDa[i][j+13],MSDa[i][j+14],MSDa[i][j+15]);
+
+			vVSDa = _mm_set_epi8(VSDa[i][j+0 ],VSDa[i][j+1 ],VSDa[i][j+2 ],VSDa[i][j+3 ],
+					     VSDa[i][j+4 ],VSDa[i][j+5 ],VSDa[i][j+6 ],VSDa[i][j+7 ],
+					     VSDa[i][j+8 ],VSDa[i][j+9 ],VSDa[i][j+10],VSDa[i][j+11],
+					     VSDa[i][j+12],VSDa[i][j+13],VSDa[i][j+14],VSDa[i][j+15]);
 
 			cmpl = _mm_cmplt_epi8(vMSDa, vm);	//if(vMSDa < vm)
 			cmpg = _mm_cmpgt_epi8(vMSDa, vm);	//if(vMSDa > vm)
@@ -80,13 +80,14 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 
 			vOSD = _mm_sub_epi8(vMSD, vm);
 
-			NvOSD = _mm_add_epi8(vOSD,_mm_add_epi8(vOSD,vOSD));
+			NvOSD = _mm_add_epi8(vOSD,_mm_add_epi8(vOSD,vOSD));	//NvOSD = N * vOSD = 3 * vOSD
 			cmpl = _mm_cmplt_epi8(vVSDa, NvOSD);	//if(vVSDa < vOSD * 3)
 			cmpg = _mm_cmpgt_epi8(vVSDa, NvOSD);	//if(vVSDa > vOSD * 3)
 
 			vVSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vVSDa,one)),				//if(vVSDa < vOSD * vN) -> vVSD = vVSDa + 1
 			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vVSDa,one)),	//else if(vVSDa > vOSD * vN) -> vVSD = vVSDa - 1
 			       _mm_andnot_si128(cmpg, vVSDa))));							//else -> vVSD = vVSDa
+
 
 			cmpl = _mm_cmplt_epi8(vVSD, vVmax);		//if(vVSD < vVmax)
 			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVSD),	//if(vVSD < vVmax) -> vVSD = vVSD
@@ -100,63 +101,58 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 			vmSD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),	//if(vOSD < vVSD) -> vmSD = 0
 			       _mm_andnot_si128(cmpl, vblanc));		//else -> vmSD = 255
 
-			_mm_store_si128( &vmSD16, vmSD);
-			_mm_store_si128( &vMSD16, vMSD);
-			_mm_store_si128( &vVSD16, vVSD);
 
-			//printf("%d, %d, %d\n", sizeof(vmSD16[0]), sizeof(vuint8), sizeof(unsigned char));
-
-			mSD[i][j+0] = (vmSD16[0] >> 56) & 255;
-			mSD[i][j+1] = (vmSD16[0] >> 48) & 255;
-			mSD[i][j+2] = (vmSD16[0] >> 40) & 255;
-			mSD[i][j+3] = (vmSD16[0] >> 32) & 255;
-			mSD[i][j+4] = (vmSD16[0] >> 24) & 255;
-			mSD[i][j+5] = (vmSD16[0] >> 16) & 255;
-			mSD[i][j+6] = (vmSD16[0] >> 8) & 255;
-			mSD[i][j+7] = (vmSD16[0] >> 0) & 255;
-			mSD[i][j+8] = (vmSD16[1] >> 56) & 255;
-			mSD[i][j+9] = (vmSD16[1] >> 48) & 255;
-			mSD[i][j+10] = (vmSD16[1] >> 40) & 255;
-			mSD[i][j+11] = (vmSD16[1] >> 32) & 255;
-			mSD[i][j+12] = (vmSD16[1] >> 24) & 255;
-			mSD[i][j+13] = (vmSD16[1] >> 16) & 255;
-			mSD[i][j+14] = (vmSD16[1] >> 8) & 255;
-			mSD[i][j+15] = (vmSD16[1] >> 0) & 255;
+			mSD[i][j+15] = (vmSD[0] >> 0 ) & 255;
+			mSD[i][j+14] = (vmSD[0] >> 8 ) & 255;
+			mSD[i][j+13] = (vmSD[0] >> 16) & 255;
+			mSD[i][j+12] = (vmSD[0] >> 24) & 255;
+			mSD[i][j+11] = (vmSD[0] >> 32) & 255;
+			mSD[i][j+10] = (vmSD[0] >> 40) & 255;
+			mSD[i][j+9 ] = (vmSD[0] >> 48) & 255;
+			mSD[i][j+8 ] = (vmSD[0] >> 56) & 255;
+			mSD[i][j+7 ] = (vmSD[1] >> 0 ) & 255;
+			mSD[i][j+6 ] = (vmSD[1] >> 8 ) & 255;
+			mSD[i][j+5 ] = (vmSD[1] >> 16) & 255;
+			mSD[i][j+4 ] = (vmSD[1] >> 24) & 255;
+			mSD[i][j+3 ] = (vmSD[1] >> 32) & 255;
+			mSD[i][j+2 ] = (vmSD[1] >> 40) & 255;
+			mSD[i][j+1 ] = (vmSD[1] >> 48) & 255;
+			mSD[i][j+0 ] = (vmSD[1] >> 56) & 255;
 
 
-			MSD[i][j+0] = (vMSD16[0] >> 56) & 255;
-			MSD[i][j+1] = (vMSD16[0] >> 48) & 255;
-			MSD[i][j+2] = (vMSD16[0] >> 40) & 255;
-			MSD[i][j+3] = (vMSD16[0] >> 32) & 255;
-			MSD[i][j+4] = (vMSD16[0] >> 24) & 255;
-			MSD[i][j+5] = (vMSD16[0] >> 16) & 255;
-			MSD[i][j+6] = (vMSD16[0] >> 8) & 255;
-			MSD[i][j+7] = (vMSD16[0] >> 0) & 255;
-			MSD[i][j+8] = (vMSD16[1] >> 56) & 255;
-			MSD[i][j+9] = (vMSD16[1] >> 48) & 255;
-			MSD[i][j+10] = (vMSD16[1] >> 40) & 255;
-			MSD[i][j+11] = (vMSD16[1] >> 32) & 255;
-			MSD[i][j+12] = (vMSD16[1] >> 24) & 255;
-			MSD[i][j+13] = (vMSD16[1] >> 16) & 255;
-			MSD[i][j+14] = (vMSD16[1] >> 8) & 255;
-			MSD[i][j+15] = (vMSD16[1] >> 0) & 255;
+			MSD[i][j+15] = (vMSD[0] >> 0 ) & 255;
+			MSD[i][j+14] = (vMSD[0] >> 8 ) & 255;
+			MSD[i][j+13] = (vMSD[0] >> 16) & 255;
+			MSD[i][j+12] = (vMSD[0] >> 24) & 255;
+			MSD[i][j+11] = (vMSD[0] >> 32) & 255;
+			MSD[i][j+10] = (vMSD[0] >> 40) & 255;
+			MSD[i][j+9 ] = (vMSD[0] >> 48) & 255;
+			MSD[i][j+8 ] = (vMSD[0] >> 56) & 255;
+			MSD[i][j+7 ] = (vMSD[1] >> 0 ) & 255;
+			MSD[i][j+6 ] = (vMSD[1] >> 8 ) & 255;
+			MSD[i][j+5 ] = (vMSD[1] >> 16) & 255;
+			MSD[i][j+4 ] = (vMSD[1] >> 24) & 255;
+			MSD[i][j+3 ] = (vMSD[1] >> 32) & 255;
+			MSD[i][j+2 ] = (vMSD[1] >> 40) & 255;
+			MSD[i][j+1 ] = (vMSD[1] >> 48) & 255;
+			MSD[i][j+0 ] = (vMSD[1] >> 56) & 255;
 
-			VSD[i][j+0] = (vVSD16[0] >> 56) & 255;
-			VSD[i][j+1] = (vVSD16[0] >> 48) & 255;
-			VSD[i][j+2] = (vVSD16[0] >> 40) & 255;
-			VSD[i][j+3] = (vVSD16[0] >> 36) & 255;
-			VSD[i][j+4] = (vVSD16[0] >> 24) & 255;
-			VSD[i][j+5] = (vVSD16[0] >> 16) & 255;
-			VSD[i][j+6] = (vVSD16[0] >> 8) & 255;
-			VSD[i][j+7] = (vVSD16[0] >> 0) & 255;
-			VSD[i][j+8] = (vVSD16[1] >> 56) & 255;
-			VSD[i][j+9] = (vVSD16[1] >> 48) & 255;
-			VSD[i][j+10] = (vVSD16[1] >> 40) & 255;
-			VSD[i][j+11] = (vVSD16[1] >> 36) & 255;
-			VSD[i][j+12] = (vVSD16[1] >> 24) & 255;
-			VSD[i][j+13] = (vVSD16[1] >> 16) & 255;
-			VSD[i][j+14] = (vVSD16[1] >> 8) & 255;
-			VSD[i][j+15] = (vVSD16[1] >> 0) & 255;
+			VSD[i][j+15] = (vVSD[0] >> 0 ) & 255;
+			VSD[i][j+14] = (vVSD[0] >> 8 ) & 255;
+			VSD[i][j+13] = (vVSD[0] >> 16) & 255;
+			VSD[i][j+12] = (vVSD[0] >> 24) & 255;
+			VSD[i][j+11] = (vVSD[0] >> 32) & 255;
+			VSD[i][j+10] = (vVSD[0] >> 40) & 255;
+			VSD[i][j+9 ] = (vVSD[0] >> 48) & 255;
+			VSD[i][j+8 ] = (vVSD[0] >> 56) & 255;
+			VSD[i][j+7 ] = (vVSD[1] >> 0 ) & 255;
+			VSD[i][j+6 ] = (vVSD[1] >> 8 ) & 255;
+			VSD[i][j+5 ] = (vVSD[1] >> 16) & 255;
+			VSD[i][j+4 ] = (vVSD[1] >> 24) & 255;
+			VSD[i][j+3 ] = (vVSD[1] >> 32) & 255;
+			VSD[i][j+2 ] = (vVSD[1] >> 40) & 255;
+			VSD[i][j+1 ] = (vVSD[1] >> 48) & 255;
+			VSD[i][j+0 ] = (vVSD[1] >> 56) & 255;
 		}
 	}
 }
