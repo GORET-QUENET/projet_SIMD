@@ -15,7 +15,7 @@
 //Commande SSE : https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 
 #define NBFRAME 300
-#define THETA 30
+#define THETA 20
 #define N 3
 #define Vmax 254
 #define Vmin 4
@@ -268,8 +268,8 @@ void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
                                 printf("%d\t", m[i][j]);
 		printf("\n");
 	}
+	printf("\n\n\n");
 }
-
 
 void test_visage()
 {
@@ -286,7 +286,7 @@ void test_visage()
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 		inverser_matrice(m, nrl, nrh, ncl, nch);
-		//afficher_matrice(m, nrl, nrh, ncl, nch);
+		afficher_matrice(m, nrl, nrh, ncl, nch);
 		switch(i){
 		case 0: 	
 			Erosion3(nrl, nrh, ncl, nch, m, tmp);
@@ -323,6 +323,7 @@ void test_visage()
 		default:
 			return;
 		}	
+		afficher_matrice(m, nrl, nrh, ncl, nch);
         	inverser_matrice(m, nrl, nrh, ncl, nch);	
 		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 	}
@@ -416,11 +417,11 @@ int main(int argc, char **argv)
 			}	
 			else
 			{
-				/*FD(*nrl, *nrh, *ncl, *nch, ma, m, mFD);
-				sprintf(filename,"FD/hall%06d.pgm", i);
-				SavePGM_ui8matrix(mFD, *nrl, *nrh, *ncl, *nch, filename);
+				FD(nrl, nrh, ncl, nch, ma, m, mFD);
+				sprintf(filename,"FD/hall%06d.pgm", step);
+				SavePGM_ui8matrix(mFD, nrl, nrh, ncl, nch, filename);
 
-				Fermeture3(*nrl, *nrh, *ncl, *nch, mFD, tmp);
+				/*Fermeture3(*nrl, *nrh, *ncl, *nch, mFD, tmp);
 				Fermeture5(*nrl, *nrh, *ncl, *nch, mFD, tmp);
 				sprintf(filename,"FD+morpho/hall%06d.pgm", i);
 				SavePGM_ui8matrix(mFD, *nrl, *nrh, *ncl, *nch, filename);*/

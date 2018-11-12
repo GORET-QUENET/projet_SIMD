@@ -6,9 +6,9 @@
 void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
 /*--------------------------------------------------------------------------------*/
 {
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			dest[i][j] = src[i][j];
 		}
