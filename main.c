@@ -48,8 +48,8 @@ void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **m
 				           ma[i][j+12],ma[i][j+13],ma[i][j+14],ma[i][j+15]);
 
 			cmpl = _mm_cmplt_epi8(_mm_sub_epi8(vm,vma), vTHETA);	//if( vm - vma < vTHETA)
-			vmFD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),	//if( vm - vma < vTHETA) -> vmFD = 0
-			       _mm_andnot_si128(cmpl, vblanc));		//else -> vmFD = 255
+			vmFD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),		//if( vm - vma < vTHETA) -> vmFD = 0
+			       _mm_andnot_si128(cmpl, vblanc));			//else -> vmFD = 255
 
 			mFD[i][j+15] = (vmFD[0] >> 0 ) & 255;
 			mFD[i][j+14] = (vmFD[0] >> 8 ) & 255;
@@ -271,7 +271,8 @@ void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	printf("\n\n\n");
 }
 
-void test_visage()
+
+void test_visage(int nb)
 {
 	long nrl; 
 	long nrh;
@@ -281,7 +282,7 @@ void test_visage()
 	uint8 **tmp;
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < nb; i++){
 		sprintf(filename,"test2.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
@@ -448,7 +449,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{ // argc > 1, alors MODE TEST
-		test_visage();
+		int nb = atoi(argv[1]);
+		test_visage(nb);
 		printf("end\n");
 	}
 	
