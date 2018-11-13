@@ -4,11 +4,13 @@
 #include "nrdef.h"
 #include "morpho.h"
 
+#define CHUNK 10
 
 /*--------------------------------------------------------------------------------*/
 void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
 /*--------------------------------------------------------------------------------*/
 {
+	#pragma omp parallel for schedule(static, CHUNK)
 	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
@@ -162,14 +164,21 @@ void Ouverture5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static) 
+	#pragma omp parallel for schedule(static, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
                 {
-                        tmp[i][j] = m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1];
-                        tmp[i][j]&= m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1];
-                        tmp[i][j]&= m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1];
+                        tmp[i][j] = m[i+1][j] & m[i][j] & m[i-1][j];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	#pragma omp parallel for schedule(static, CHUNK)
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i][j+1] & m[i][j] & m[i][j-1];
                 }
         }
         CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
@@ -179,33 +188,29 @@ void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
 void Erosion5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static)
-        for(int i = nrl; i <= nrh; i++)
-        {
-                for(int j = ncl; j <= nch; j++)
-                {
-                        tmp[i][j] = m[i-2][j-2] & m[i-2][j-1] & m[i-2][j+0] & m[i-2][j+1] & m[i-2][j+2];
-                        tmp[i][j]&= m[i-1][j-2] & m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1] & m[i-1][j+2];
-                        tmp[i][j]&= m[i+0][j-2] & m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1] & m[i+0][j+2];
-                        tmp[i][j]&= m[i+1][j-2] & m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1] & m[i+1][j+2];
-                        tmp[i][j]&= m[i+2][j-2] & m[i+2][j-1] & m[i+2][j+0] & m[i+2][j+1] & m[i+2][j+2];
-                }
-        }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
+	Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
 }
 
 /*-----------------------------------------------------------------------------*/
 void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	#pragma omp for schedule(static)
+	#pragma omp parallel for schedule(static, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
                 {
-                        tmp[i][j] = m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1];
-                        tmp[i][j]|= m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1];
-                        tmp[i][j]|= m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1];
+                        tmp[i][j] = m[i+1][j] | m[i][j] | m[i-1][j];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	#pragma omp parallel for schedule(static, CHUNK)
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i][j+1] | m[i][j] | m[i][j-1];
                 }
         }
         CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
@@ -215,19 +220,8 @@ void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uin
 void Dilatation5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	#pragma omp for schedule(static)
-        for(int i = nrl; i <= nrh; i++)
-        {
-                for(int j = ncl; j <= nch; j++)
-                {
-                        tmp[i][j] = m[i-2][j-2] | m[i-2][j-1] | m[i-2][j+0] | m[i-2][j+1] | m[i-2][j+2];
-                        tmp[i][j]|= m[i-1][j-2] | m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1] | m[i-1][j+2];
-                        tmp[i][j]|= m[i+0][j-2] | m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1] | m[i+0][j+2];
-                        tmp[i][j]|= m[i+1][j-2] | m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1] | m[i+1][j+2];
-                        tmp[i][j]|= m[i+2][j-2] | m[i+2][j-1] | m[i+2][j+0] | m[i+2][j+1] | m[i+2][j+2];
-                }
-        }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
+	Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
 }
 
 /*-------------------------------------------------------------------------------*/

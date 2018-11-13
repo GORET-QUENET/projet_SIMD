@@ -383,7 +383,7 @@ void test_morpho_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	for(int step = 0; step < NBFRAME; step++)
 	{
-		if(step)
+		if(step == 1)
 		{
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
