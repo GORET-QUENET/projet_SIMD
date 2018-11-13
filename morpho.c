@@ -10,7 +10,6 @@
 void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
 /*--------------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static, CHUNK)
 	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
@@ -159,6 +158,20 @@ void Ouverture5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 	Dilatation5(nrl, nrh, ncl, nch, m, tmp);
 }
 
+/*--------------------------------------------------------------------------------*/
+void CopyMatrice_parallel(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
+/*--------------------------------------------------------------------------------*/
+{
+	#pragma omp parallel for schedule(static, CHUNK)
+	for(int i = nrl; i <= nrh; i++)
+	{
+		for(int j = ncl; j <= nch; j++)
+		{
+			dest[i][j] = src[i][j];
+		}
+	}
+}
+
 
 /*--------------------------------------------------------------------------*/
 void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
@@ -172,7 +185,7 @@ void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
                         tmp[i][j] = m[i+1][j] & m[i][j] & m[i-1][j];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
 	#pragma omp parallel for schedule(static, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
@@ -181,7 +194,7 @@ void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
                         tmp[i][j] = m[i][j+1] & m[i][j] & m[i][j-1];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -204,7 +217,7 @@ void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uin
                         tmp[i][j] = m[i+1][j] | m[i][j] | m[i-1][j];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
 	#pragma omp parallel for schedule(static, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
@@ -213,7 +226,7 @@ void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uin
                         tmp[i][j] = m[i][j+1] | m[i][j] | m[i][j-1];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
 }
 
 /*-----------------------------------------------------------------------------*/

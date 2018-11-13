@@ -312,7 +312,69 @@ void Generate_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], 
 	}
 }
 
-void test_FD(uint8 **m, long nrl, long nrh, long ncl, long nch)
+void test_FD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	char *filename = malloc( 100 * sizeof(char));
+	uint8 **ma; // matrice t-1
+	uint8 **mFD; // matrice après FD
+
+	ma = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	mFD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+
+	for(int step = 0; step < NBFRAME; step++)
+	{
+		sprintf(filename,"hall/hall%06d.pgm", step);
+		CopyMatrice(nrl, nrh, ncl, nch, ma, m);
+		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+
+		if(step > 0)
+		{
+			SEQ_FD(nrl, nrh, ncl, nch, ma, m, mFD);
+			sprintf(filename,"FD/hall%06d.pgm", step);
+			SavePGM_ui8matrix(mFD, nrl, nrh, ncl, nch, filename);
+		}
+	}
+}
+
+void test_SD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	char *filename = malloc( 100 * sizeof(char));
+	uint8 **mSD; // matrice après SD
+	uint8 **MSD; // matrice Moyenne
+	uint8 **MSDa; // matrice moyenne à t-1
+	uint8 **OSD; // matrice différence
+	uint8 **VSD; // matrice Variance V
+	uint8 **VSDa; // matrice variance V à t-1
+
+	mSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	MSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	MSDa = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	OSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	VSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	VSDa = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+
+	for(int step = 0; step < NBFRAME; step++)
+	{
+		sprintf(filename,"hall/hall%06d.pgm", step);
+		CopyMatrice(nrl, nrh, ncl, nch, MSDa, MSD);
+		CopyMatrice(nrl, nrh, ncl, nch, VSDa, VSD);
+		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+
+		if(step == 0)
+		{
+			CopyMatrice(nrl, nrh, ncl, nch, MSD, m);
+			CopyValue(nrl, nrh, ncl, nch, VSD, Vmin);
+		}	
+		else
+		{
+			SEQ_SD(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
+			sprintf(filename,"SD/hall%06d.pgm", step);
+			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
+		}
+	}
+}
+
+void test_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **ma; // matrice t-1
@@ -336,7 +398,7 @@ void test_FD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	}
 }
 
-void test_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
+void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **mSD; // matrice après SD
@@ -374,8 +436,7 @@ void test_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	}
 }
 
-
-void test_morpho_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
+void test_morpho_SD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **tmp;
@@ -383,7 +444,58 @@ void test_morpho_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	for(int step = 0; step < NBFRAME; step++)
 	{
-		if(step == 1)
+		if(step)
+		{
+			sprintf(filename,"SD/hall%06d.pgm", step);
+			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+
+			Erosion3(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture3(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture3(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture5(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture5(nrl, nrh, ncl, nch, m, tmp);
+			
+			
+			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
+			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
+		}
+	}
+}
+
+void test_morpho_FD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	char *filename = malloc( 100 * sizeof(char));
+	uint8 **tmp;
+	
+	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	for(int step = 0; step < NBFRAME; step++)
+	{
+		if(step)
+		{
+			sprintf(filename,"FD/hall%06d.pgm", step);
+			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+
+			Fermeture3(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture3(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture5(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture5(nrl, nrh, ncl, nch, m, tmp);
+		
+			
+			sprintf(filename,"FD+morpho/hall%06d.pgm", step);
+			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
+		}
+	}
+}
+
+void test_morpho_SD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	char *filename = malloc( 100 * sizeof(char));
+	uint8 **tmp;
+	
+	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	for(int step = 0; step < NBFRAME; step++)
+	{
+		if(step)
 		{
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
@@ -401,7 +513,7 @@ void test_morpho_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	}
 }
 
-void test_morpho_FD(uint8 **m, long nrl, long nrh, long ncl, long nch)
+void test_morpho_FD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **tmp;
@@ -426,17 +538,6 @@ void test_morpho_FD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	}
 }
 
-void test_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], char* AlgoName)
-{
-	char *filename = malloc( 100 * sizeof(char));
-	for(int step = 10; step < NBFRAME; step+=10)
-	{
-		sprintf(filename,"%s/hall%06d.pgm", AlgoName, step);
-		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
-		Generate_ROC(m, nrl, nrh, ncl, nch, ROC, step);
-	}
-}
-
 void temps_fichier(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
 	char *filename = malloc( 100 * sizeof(char));
@@ -452,6 +553,105 @@ void temps_fichier(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	}
 }
 
+void test_code_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	struct timeval tv1, tv2, tv3, tv4, tv5, tvfile;
+	double temps_SD, temps_FD, temps_morpho_SD, temps_morpho_FD;
+	int cycle_SD, cycle_FD, cycle_morpho_SD, cycle_morpho_FD;
+	clock_t t1, t2, t3, t4, t5, tfile;
+
+	t1 = clock();gettimeofday(&tv1, NULL);
+	test_FD_SEQ(m, nrl, nrh, ncl, nch);
+	t2 = clock();gettimeofday(&tv2, NULL);
+	test_SD_SEQ(m, nrl, nrh, ncl, nch);
+	t3 = clock();gettimeofday(&tv3, NULL);
+	test_morpho_SD_SEQ(m, nrl, nrh, ncl, nch);
+	t4 = clock();gettimeofday(&tv4, NULL);
+	test_morpho_FD_SEQ(m, nrl, nrh, ncl, nch);
+	t5 = clock();gettimeofday(&tv5, NULL);
+
+	tfile = clock();
+	temps_fichier(m, nrl, nrh, ncl, nch);
+	tfile = clock() - tfile;gettimeofday(&tvfile, NULL);
+	
+	//Affichage des temps de calculs
+	//Temps
+	temps_FD = (double) (tv2.tv_usec - tv1.tv_usec - (tvfile.tv_usec - tv5.tv_usec))/ 1000000;
+	temps_SD = (double) (tv3.tv_usec - tv2.tv_usec - (tvfile.tv_usec - tv5.tv_usec))/ 1000000;
+	temps_morpho_SD = (double) (tv4.tv_usec - tv3.tv_usec - (tvfile.tv_usec - tv5.tv_usec))/ 1000000;
+	temps_morpho_FD = (double) (tv5.tv_usec - tv4.tv_usec - (tvfile.tv_usec - tv5.tv_usec))/ 1000000;
+	//Cycles
+	cycle_FD = (t2 - t1 - tfile);
+	cycle_SD = (t3 - t2 - tfile);
+	cycle_morpho_SD = (t4 - t3 - tfile);
+	cycle_morpho_FD = (t5 - t4 - tfile);
+	//Affichage
+	printf("|-------------------------------|\n");
+	printf("|  Temps de calculs sequentiels |\n");
+	printf("|_______________________________|\n");
+	printf("|Pour FD:\t\t\t|\n|t = %.3f | cycle = %d\t|\n",temps_FD, cycle_FD);
+	printf("|Pour SD:\t\t\t|\n|t = %.3f | cycle = %d\t|\n",temps_SD, cycle_SD);
+	printf("|Pour les morphos sur SD:\t|\n|t = %.3f | cycle = %d\t|\n",temps_morpho_SD, cycle_morpho_SD);
+	printf("|Pour les morphos sur FD:\t|\n|t = %.3f | cycle = %d\t|\n",temps_morpho_FD, cycle_morpho_FD);
+	printf("|_______________________________|\n\n\n");
+}
+
+void test_code_OPTI(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	struct timeval tv1, tv2, tv3, tv4, tv5, tvfile;
+	double temps_SD, temps_FD, temps_morpho_SD, temps_morpho_FD;
+	int cycle_SD, cycle_FD, cycle_morpho_SD, cycle_morpho_FD;
+	clock_t t1, t2, t3, t4, t5, tfile;
+
+	t1 = clock();gettimeofday(&tv1, NULL);
+	test_FD_SSE(m, nrl, nrh, ncl, nch);
+	t2 = clock();gettimeofday(&tv2, NULL);
+	test_SD_SSE(m, nrl, nrh, ncl, nch);
+	t3 = clock();gettimeofday(&tv3, NULL);
+	test_morpho_SD_THREAD(m, nrl, nrh, ncl, nch);
+	t4 = clock();gettimeofday(&tv4, NULL);
+	test_morpho_FD_THREAD(m, nrl, nrh, ncl, nch);
+	t5 = clock();gettimeofday(&tv5, NULL);
+
+	tfile = clock();
+	temps_fichier(m, nrl, nrh, ncl, nch);
+	tfile = clock() - tfile;gettimeofday(&tvfile, NULL);
+	
+	//Affichage des temps de calculs
+	//Temps
+	temps_FD = (double) (tv2.tv_usec - tv1.tv_usec - (tvfile.tv_usec - tv5.tv_usec) )/ 1000000;
+	temps_SD = (double) (tv3.tv_usec - tv2.tv_usec - (tvfile.tv_usec - tv5.tv_usec) )/ 1000000;
+	temps_morpho_SD = (double) (tv4.tv_usec - tv3.tv_usec - (tvfile.tv_usec - tv5.tv_usec) )/ 1000000;
+	temps_morpho_FD = (double) (tv5.tv_usec - tv4.tv_usec - (tvfile.tv_usec - tv5.tv_usec) )/ 1000000;
+	//Cycles
+	cycle_FD = (t2 - t1 - tfile);
+	cycle_SD = (t3 - t2 - tfile);
+	cycle_morpho_SD = (t4 - t3 - tfile);
+	cycle_morpho_FD = (t5 - t4 - tfile);
+	//Affichage
+	printf("|-------------------------------|\n");
+	printf("|   Temps de calculs optimise   |\n");
+	printf("|_______________________________|\n");
+	printf("|Pour FD:\t\t\t|\n|t = %.3f | cycle = %d\t|\n",temps_FD, cycle_FD);
+	printf("|Pour SD:\t\t\t|\n|t = %.3f | cycle = %d\t|\n",temps_SD, cycle_SD);
+	printf("|Pour les morphos sur SD:\t|\n|t = %.3f | cycle = %d\t|\n",temps_morpho_SD, cycle_morpho_SD);
+	printf("|Pour les morphos sur FD:\t|\n|t = %.3f | cycle = %d\t|\n",temps_morpho_FD, cycle_morpho_FD);
+	printf("|_______________________________|\n\n\n");
+}
+
+void test_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], char* AlgoName)
+{
+	char *filename = malloc( 100 * sizeof(char));
+	for(int step = 10; step < NBFRAME; step+=10)
+	{
+		sprintf(filename,"%s/hall%06d.pgm", AlgoName, step);
+		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+		Generate_ROC(m, nrl, nrh, ncl, nch, ROC, step);
+	}
+}
+
+
+
 /**************************************************/
 /*             FIN DES TESTS UNITAIRES            */
 /**************************************************/
@@ -461,9 +661,6 @@ int main(int argc, char **argv)
 {
 	if (argc == 1)
 	{ // EXECUTION NORMALE DU PROGRAMME
-		float temps_SD, temps_FD, temps_morpho_SD, temps_morpho_FD;
-		int cycle_SD, cycle_FD, cycle_morpho_SD, cycle_morpho_FD;
-		clock_t t1, t2, t3, t4, t5, tfile;
 		int ROC_FD[4] = {0}; //VP, FN, FP, VN
 		int ROC_SD[4] = {0}; //VP, FN, FP, VN
 		int ROC_FD_morpho[4] = {0}; //VP, FN, FP, VN
@@ -503,42 +700,15 @@ int main(int argc, char **argv)
 		m = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 		
 		/* ########################## */
-		t1 = clock();
-		test_FD(m, nrl, nrh, ncl, nch);
-		t2 = clock();
-		test_SD(m, nrl, nrh, ncl, nch);
-		t3 = clock();
-		test_morpho_SD(m, nrl, nrh, ncl, nch);
-		t4 = clock();
-		test_morpho_FD(m, nrl, nrh, ncl, nch);
-		t5 = clock();
-	
-		tfile = clock();
-		temps_fichier(m, nrl, nrh, ncl, nch);
-		tfile = clock() - tfile;
+
+		test_code_SEQ(m, nrl, nrh, ncl, nch);
+		test_code_OPTI(m, nrl, nrh, ncl, nch);
 
 		test_ROC(m, nrl, nrh, ncl, nch, ROC_FD, "FD");
 		test_ROC(m, nrl, nrh, ncl, nch, ROC_SD, "SD");
 		test_ROC(m, nrl, nrh, ncl, nch, ROC_FD_morpho, "FD+morpho");
 		test_ROC(m, nrl, nrh, ncl, nch, ROC_SD_morpho, "SD+morpho");
 		
-		//Affichage des temps de calculs
-		//Temps
-		temps_FD = (float)(t2 - t1 - tfile) / CLOCKS_PER_SEC;
-		temps_SD = (float)(t3 - t2 - tfile) / CLOCKS_PER_SEC;
-		temps_morpho_SD = (float)(t4 - t3 - tfile) / CLOCKS_PER_SEC;
-		temps_morpho_FD = (float)(t5 - t4 - tfile) / CLOCKS_PER_SEC;
-		//Cycles
-		cycle_FD = (t2 - t1 - tfile);
-		cycle_SD = (t3 - t2 - tfile);
-		cycle_morpho_SD = (t4 - t3 - tfile);
-		cycle_morpho_FD = (t5 - t4 - tfile);
-		//Affichage
-		printf("Pour FD:\nt = %.3f | cycle = %d\n",temps_FD, cycle_FD);
-		printf("Pour SD:\nt = %.3f | cycle = %d\n",temps_SD, cycle_SD);
-		printf("Pour les morphos sur SD:\nt = %.3f | cycle = %d\n",temps_morpho_SD, cycle_morpho_SD);
-		printf("Pour les morphos sur FD:\nt = %.3f | cycle = %d\n\n\n\n",temps_morpho_FD, cycle_morpho_FD);
-
 
 		//Affichage de la matrice ROC
 		printf("Pour SD :\nVP = %d, FN = %d, FP = %d, VN = %d\n",ROC_SD[0]/30,ROC_SD[1]/30,ROC_SD[2]/30,ROC_SD[3]/30);
