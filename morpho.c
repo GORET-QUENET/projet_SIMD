@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <omp.h>
 
 #include "nrdef.h"
 #include "morpho.h"
-#include <omp.h>
+
 
 /*--------------------------------------------------------------------------------*/
 void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)

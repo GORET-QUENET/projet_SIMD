@@ -306,8 +306,8 @@ void Generate_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], 
 				ROC[2]++;	//FP
 			else if(v[i][j] == 0 && m[i][j] == 0)
 				ROC[3]++;	//VN
-			//else
-				//printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
+			else
+				printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
 		}
 	}
 }
@@ -388,11 +388,11 @@ void test_morpho_SD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 
-			Erosion3(nrl, nrh, ncl, nch, m, tmp);
-			Fermeture3(nrl, nrh, ncl, nch, m, tmp);
-			Ouverture3(nrl, nrh, ncl, nch, m, tmp);
-			Fermeture5(nrl, nrh, ncl, nch, m, tmp);
-			Ouverture5(nrl, nrh, ncl, nch, m, tmp);
+			Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture5_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
 			
 			
 			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
@@ -414,10 +414,10 @@ void test_morpho_FD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			sprintf(filename,"FD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 
-			Fermeture3(nrl, nrh, ncl, nch, m, tmp);
-			Ouverture3(nrl, nrh, ncl, nch, m, tmp);
-			Ouverture5(nrl, nrh, ncl, nch, m, tmp);
-			Fermeture5(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
+			Fermeture5_parallel(nrl, nrh, ncl, nch, m, tmp);
 		
 			
 			sprintf(filename,"FD+morpho/hall%06d.pgm", step);
@@ -446,6 +446,7 @@ void temps_fichier(uint8 **m, long nrl, long nrh, long ncl, long nch)
 		{
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
+			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
