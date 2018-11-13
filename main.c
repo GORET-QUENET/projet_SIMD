@@ -4,7 +4,7 @@
 #include <ctype.h> 
 #include <string.h>
 #include <math.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "nrdef.h"
 #include "vnrdef.h"
@@ -265,18 +265,17 @@ int64_t clocktime() {
 
 void test_visage()
 {
+	struct timeval tv1, tv2;
 	long nrl; 
 	long nrh;
 	long ncl;
 	long nch;
-	//int64_t end;
-	//int64_t start;
 	uint8 **m; // image courante 
 	uint8 **tmp;
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
 
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < 20; i++){
 		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
@@ -284,7 +283,7 @@ void test_visage()
 		//afficher_matrice(m, nrl, nrh, ncl, nch);
 		switch(i){
 		case 0: 
-			//start = clocktime();	
+			gettimeofday(&tv1, NULL);
 			Erosion3(nrl, nrh, ncl, nch, m, tmp);
 			sprintf(filename,"visage/test_erosion3.pgm");
 			break;
@@ -313,12 +312,51 @@ void test_visage()
                         sprintf(filename,"visage/test_ouverture3.pgm");
                         break;
 		case 7:
-			//start = clocktime();
                         Ouverture5(nrl, nrh, ncl, nch, m, tmp);
                         sprintf(filename,"visage/test_ouverture5.pgm");
-			//end = clocktime();
-                        //printf("Ouverture5_seq completed   %8lld ms\n", end - start);
+			gettimeofday(&tv2, NULL);
+			printf ("Total sequential time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
                         break;
+		case 8:
+			gettimeofday(&tv1, NULL);
+                        Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion3_par.pgm");
+                        break;
+		case 9:
+			Erosion5_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion5_par.pgm");
+                        break;
+		case 10:
+                        Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation3_par.pgm");
+                        break;
+                case 11:
+                        Dilatation5_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation5_par.pgm");
+                        break;
+		case 12:
+                        Fermeture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_fermeture3_par.pgm");
+                        break;
+                case 13:
+                        Fermeture5_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_fermeture5_par.pgm");
+                        break;
+		case 14:
+                        Ouverture3_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_ouverture3_par.pgm");
+                        break;
+                case 15:
+                        Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_ouverture5_par.pgm");
+			gettimeofday(&tv2, NULL);
+			printf ("Total parallel time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
+                        break;
+
+
+
+
+
 		default:
 			return;
 		}	
@@ -474,9 +512,9 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-		t2 = clock();
+		//t2 = clock();
 		//test_visage();
-		t = (float)(t2 - t1) / CLOCKS_PER_SEC;
+		//t = (float)(t2 - t1) / CLOCKS_PER_SEC;
 		printf("end after %fs\n", t);
 		printf("Pour SD :\nVP = %d, FN = %d, FP = %d, VN = %d\n",ROC_SD[0]/30,ROC_SD[1]/30,ROC_SD[2]/30,ROC_SD[3]/30);
 		float p = (float)(ROC_SD[0] + ROC_SD[3]) / (float)(ROC_SD[0] + ROC_SD[1] + ROC_SD[2] + ROC_SD[3]) * 100.0;

@@ -2,6 +2,7 @@
 
 #include "nrdef.h"
 #include "morpho.h"
+#include <omp.h>
 
 /*--------------------------------------------------------------------------------*/
 void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
@@ -154,3 +155,109 @@ void Ouverture5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 	Erosion5(nrl, nrh, ncl, nch, m, tmp);
 	Dilatation5(nrl, nrh, ncl, nch, m, tmp);
 }
+
+
+/*--------------------------------------------------------------------------*/
+void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*--------------------------------------------------------------------------*/
+{
+	#pragma omp parallel for schedule(static) 
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1];
+                        tmp[i][j]&= m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1];
+                        tmp[i][j]&= m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*--------------------------------------------------------------------------*/
+void Erosion5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*--------------------------------------------------------------------------*/
+{
+	#pragma omp parallel for schedule(static)
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i-2][j-2] & m[i-2][j-1] & m[i-2][j+0] & m[i-2][j+1] & m[i-2][j+2];
+                        tmp[i][j]&= m[i-1][j-2] & m[i-1][j-1] & m[i-1][j+0] & m[i-1][j+1] & m[i-1][j+2];
+                        tmp[i][j]&= m[i+0][j-2] & m[i+0][j-1] & m[i+0][j+0] & m[i+0][j+1] & m[i+0][j+2];
+                        tmp[i][j]&= m[i+1][j-2] & m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1] & m[i+1][j+2];
+                        tmp[i][j]&= m[i+2][j-2] & m[i+2][j-1] & m[i+2][j+0] & m[i+2][j+1] & m[i+2][j+2];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-----------------------------------------------------------------------------*/
+void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-----------------------------------------------------------------------------*/
+{
+	#pragma omp for schedule(static)
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1];
+                        tmp[i][j]|= m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1];
+                        tmp[i][j]|= m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-----------------------------------------------------------------------------*/
+void Dilatation5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-----------------------------------------------------------------------------*/
+{
+	#pragma omp for schedule(static)
+        for(int i = nrl; i <= nrh; i++)
+        {
+                for(int j = ncl; j <= nch; j++)
+                {
+                        tmp[i][j] = m[i-2][j-2] | m[i-2][j-1] | m[i-2][j+0] | m[i-2][j+1] | m[i-2][j+2];
+                        tmp[i][j]|= m[i-1][j-2] | m[i-1][j-1] | m[i-1][j+0] | m[i-1][j+1] | m[i-1][j+2];
+                        tmp[i][j]|= m[i+0][j-2] | m[i+0][j-1] | m[i+0][j+0] | m[i+0][j+1] | m[i+0][j+2];
+                        tmp[i][j]|= m[i+1][j-2] | m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1] | m[i+1][j+2];
+                        tmp[i][j]|= m[i+2][j-2] | m[i+2][j-1] | m[i+2][j+0] | m[i+2][j+1] | m[i+2][j+2];
+                }
+        }
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-------------------------------------------------------------------------------*/
+void Fermeture3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-------------------------------------------------------------------------------*/
+{
+        Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
+        Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-------------------------------------------------------------------------------*/
+void Fermeture5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-------------------------------------------------------------------------------*/
+{
+        Dilatation5_parallel(nrl, nrh, ncl, nch, m, tmp);
+        Erosion5_parallel(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-------------------------------------------------------------------------------*/
+void Ouverture3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-------------------------------------------------------------------------------*/
+{
+        Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
+        Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
+}
+
+/*-------------------------------------------------------------------------------*/
+void Ouverture5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
+/*-------------------------------------------------------------------------------*/
+{
+        Erosion5_parallel(nrl, nrh, ncl, nch, m, tmp);
+        Dilatation5_parallel(nrl, nrh, ncl, nch, m, tmp);
+}
+
