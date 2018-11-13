@@ -33,9 +33,9 @@ void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **m
 	vnoir = _mm_set1_epi8(0);
 	vTHETA = _mm_set1_epi8(THETA);
 
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j+=16)
+		for(int j = ncl; j <= nch; j+=16)
 		{
 			vm = _mm_set_epi8(m[i][j+0 ],m[i][j+1 ],m[i][j+2 ],m[i][j+3 ],
 				          m[i][j+4 ],m[i][j+5 ],m[i][j+6 ],m[i][j+7 ],
@@ -76,9 +76,9 @@ void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **m
 void SEQ_FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **mFD)
 /*--------------------------------------------------------------------------------*/
 {
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			if(m[i][j] - ma[i][j] < THETA)
 				mFD[i][j] = 0;
@@ -101,9 +101,9 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 	vblanc = _mm_set1_epi8(255);
 	vnoir = _mm_set1_epi8(0);
 
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j+=16)
+		for(int j = ncl; j <= nch; j+=16)
 		{
 			vm = _mm_set_epi8(m[i][j+0 ],m[i][j+1 ],m[i][j+2 ],m[i][j+3 ],
 				          m[i][j+4 ],m[i][j+5 ],m[i][j+6 ],m[i][j+7 ],
@@ -211,9 +211,9 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 void SEQ_SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **MSD, uint8 **MSDa, uint8 **OSD, uint8 **VSD, uint8 **VSDa)
 /*---------------------------------------------------------------------------------------------------------------------------------------*/
 {
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			if(MSDa[i][j] < m[i][j] )
 				MSD[i][j] = MSDa[i][j] + 1;
@@ -246,32 +246,6 @@ void SEQ_SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint
 /**************************************************/
 
 
-void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
-{
-	for (uint8 i = nrl; i <= nrh; i++)
-		for (uint8 j = ncl; j <= nch; j++)
-		{
-			if (m[i][j] == 255)
-				m[i][j] = 0;
-			else if (m[i][j] == 0)
-				m[i][j] = 255;
-			else
-				printf("Error : grey value detected\n");
-		}
-}
-			
-void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
-{
-        for (uint8 i = nrl; i <= nrh; i++)
-	{
-                for (uint8 j = ncl; j <= nch; j++)
-                                printf("%d\t", m[i][j]);
-		printf("\n");
-	}
-	printf("\n\n\n");
-}
-
-
 void test_visage(int nb)
 {
 	long nrl; 
@@ -283,7 +257,7 @@ void test_visage(int nb)
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
 	for (i = 0; i < nb; i++){
-		sprintf(filename,"test2.pgm");
+		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 		inverser_matrice(m, nrl, nrh, ncl, nch);
@@ -291,35 +265,35 @@ void test_visage(int nb)
 		switch(i){
 		case 0: 	
 			Erosion3(nrl, nrh, ncl, nch, m, tmp);
-			sprintf(filename,"test_erosion3.pgm");
+			sprintf(filename,"visage/test_erosion3.pgm");
 			break;
 		case 1:
 			Dilatation3(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"test_dilatation3.pgm");
+                	sprintf(filename,"visage/test_dilatation3.pgm");
                 	break;
 		case 2:
 			Erosion5(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"test_erosion5.pgm");
+                	sprintf(filename,"visage/test_erosion5.pgm");
                		break;
 		case 3:
 			Dilatation5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_dilatation5.pgm");
+                        sprintf(filename,"visage/test_dilatation5.pgm");
                         break;
 		case 4:
                         Fermeture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_fermeture3.pgm");
+                        sprintf(filename,"visage/test_fermeture3.pgm");
                         break;
 		case 5:
                         Fermeture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_fermeture5.pgm");
+                        sprintf(filename,"visage/test_fermeture5.pgm");
                         break;
 		case 6:
                         Ouverture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_ouverture3.pgm");
+                        sprintf(filename,"visage/test_ouverture3.pgm");
                         break;
 		case 7:
                         Ouverture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"test_ouverture5.pgm");
+                        sprintf(filename,"visage/test_ouverture5.pgm");
                         break;
 		default:
 			return;
@@ -329,6 +303,34 @@ void test_visage(int nb)
 		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 	}
 }
+
+
+void Generate_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], int step)
+{
+	uint8** v;
+	v = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	char *filename = malloc( 100 * sizeof(char));
+	sprintf(filename,"verite/hall%06d.pgm", step);
+	MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, v);
+
+	for(int i = nrl; i <= nrh; i++)
+	{
+		for(int j = ncl; j <= nch; j++)
+		{
+			if(v[i][j] == 255 && m[i][j] == 255)
+				ROC[0]++;	//VP
+			else if(v[i][j] == 255 && m[i][j] == 0)
+				ROC[1]++;	//FN
+			else if(v[i][j] == 0 && m[i][j] == 255)
+				ROC[2]++;	//FP
+			else if(v[i][j] == 0 && m[i][j] == 0)
+				ROC[3]++;	//VN
+			else
+				printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
+		}
+	}
+}
+
 
 /**************************************************/
 /*             FIN DES TESTS UNITAIRES            */
@@ -342,7 +344,8 @@ int main(int argc, char **argv)
 		char *filename = malloc( 100 * sizeof(char));
 		float t;
 		clock_t t1, t2;
-
+		int ROC_FD[4] = {0}; //VP, FN, FP, VN
+		int ROC_SD[4] = {0}; //VP, FN, FP, VN
 		/*  GENERATION DE LA MATRICE M  */
 		long nrl; 
 		long nrh;
@@ -430,7 +433,7 @@ int main(int argc, char **argv)
 				SD(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
 				sprintf(filename,"SD/hall%06d.pgm", step);
 				SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
-			
+					
 				/*Ouverture3(nrl, nrh, ncl, nch, mSD, tmp);
 				Fermeture3(nrl, nrh, ncl, nch, mSD, tmp);
 				Ouverture5(nrl, nrh, ncl, nch, mSD, tmp);
@@ -439,12 +442,24 @@ int main(int argc, char **argv)
 			
 				sprintf(filename,"SD+morpho/hall%06d.pgm", step);
 				SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);*/
+
+				if(step%10 == 0)
+				{
+					Generate_ROC(mSD, nrl, nrh, ncl, nch, ROC_SD, step);
+					Generate_ROC(mFD, nrl, nrh, ncl, nch, ROC_FD, step);
+				}
 			}
 		}
 		t2 = clock();
 		//test_visage();
 		t = (float)(t2 - t1) / CLOCKS_PER_SEC;
 		printf("end after %fs\n", t);
+		printf("Pour SD :\nVP = %d, FN = %d, FP = %d, VN = %d\n",ROC_SD[0]/30,ROC_SD[1]/30,ROC_SD[2]/30,ROC_SD[3]/30);
+		float p = (float)(ROC_SD[0] + ROC_SD[3]) / (float)(ROC_SD[0] + ROC_SD[1] + ROC_SD[2] + ROC_SD[3]) * 100.0;
+		printf("%.2f poucent de pixels vraie\n\n", p);
+		printf("Pour FD :\nVP = %d, FN = %d, FP = %d, VN = %d\n",ROC_FD[0]/30,ROC_FD[1]/30,ROC_FD[2]/30,ROC_FD[3]/30);
+		p = (float)(ROC_FD[0] + ROC_FD[3]) / (float)(ROC_FD[0] + ROC_FD[1] + ROC_FD[2] + ROC_FD[3]) * 100.0;
+		printf("%.2f poucent de pixels vraie\n", p);
 
 	}
 	else

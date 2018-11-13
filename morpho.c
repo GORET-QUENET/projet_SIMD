@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 #include "nrdef.h"
 #include "morpho.h"
@@ -19,13 +20,38 @@ void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **s
 void CopyValue(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val)
 /*--------------------------------------------------------------------------*/
 {
-	for(int i = nrl; i < nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
-		for(int j = ncl; j < nch; j++)
+		for(int j = ncl; j <= nch; j++)
 		{
 			dest[i][j] = val;
 		}
 	}
+}
+
+void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+	for (uint8 i = nrl; i <= nrh; i++)
+		for (uint8 j = ncl; j <= nch; j++)
+		{
+			if (m[i][j] == 255)
+				m[i][j] = 0;
+			else if (m[i][j] == 0)
+				m[i][j] = 255;
+			else
+				printf("Error : grey value detected\n");
+		}
+}
+			
+void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
+{
+        for (uint8 i = nrl; i <= nrh; i++)
+	{
+                for (uint8 j = ncl; j <= nch; j++)
+                                printf("%d\t", m[i][j]);
+		printf("\n");
+	}
+	printf("\n\n\n");
 }
 
 

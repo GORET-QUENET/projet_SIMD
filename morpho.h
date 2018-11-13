@@ -14,6 +14,10 @@ void CopyMatrice(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **s
 void CopyValue(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val);
 
 
+void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch);
+void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch);
+
+
 /* -------------------------------- */
 /* -- morpho de la matrice image -- */
 /* -------------------------------- */
