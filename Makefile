@@ -1,4 +1,4 @@
-CC = g++
+CC = gcc
 CFLAGS = -Wall
 EXEC_NAME = exec
 INCLUDES =
@@ -10,10 +10,10 @@ INSTALL_DIR = /usr/bin
 all : $(EXEC_NAME)
 
 clean :
-	rm $(EXEC_NAME) $(OBJ_FILES) .depends *~ *#
+	rm -f $(EXEC_NAME) $(OBJ_FILES) .depends *~ *#
 
 $(EXEC_NAME) : $(OBJ_FILES) $(FILES)
-	$(CC) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
+	$(CC) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS) -lgomp
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
@@ -22,7 +22,7 @@ $(EXEC_NAME) : $(OBJ_FILES) $(FILES)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
 %.o: %.c
-	gcc $(CFLAGS) $(INCLUDES) -o $@ -c $<
+	gcc $(CFLAGS) $(INCLUDES) -o $@ -c $< -fopenmp
 
 install :
 	cp $(EXEC_NAME) $(INSTALL_DIR)
