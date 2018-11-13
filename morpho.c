@@ -197,7 +197,7 @@ void Erosion5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
 void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	#pragma omp for schedule(static)
+	#pragma omp parallel for schedule(static)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
@@ -214,7 +214,7 @@ void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uin
 void Dilatation5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	#pragma omp for schedule(static)
+	#pragma omp parallel for schedule(static)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
