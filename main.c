@@ -17,10 +17,26 @@
 #define NBFRAME 300
 #define THETA 20
 #define N 3
-#define Vmax 254
-#define Vmin 4
+#define Vmax 200
+#define Vmin 10
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
+
+vuint8 _mm_MAX_epi8(vuint8 a, vuint b)
+{	
+	return _mm_or_si128(_mm_and_si128(_mm_cmplt_epi8(a, b),b),_mm_andnot_si128(_mm_cmplt_epi8(a, b), a));
+}
+
+vuint8 _mm_MIN_epi8(vuint a, vuint b)
+{
+	return _mm_or_si128(_mm_and_si128(_mm_cmplt_epi8(a, b),a),_mm_andnot_si128(_mm_cmplt_epi8(a, b), b));
+}
+
+
+vuint8 _mm_sub_abs_epi8(vuint8 a, vuint8 b)
+{
+	return _mm_MAX_epi8(_mm_sub_epi8(a,b), _mm_sub_epi8(b,a));
+}
 
 /*--------------------------------------------------------------------------------*/
 void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **mFD)
@@ -47,9 +63,9 @@ void FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8 **m
 				           ma[i][j+8 ],ma[i][j+9 ],ma[i][j+10],ma[i][j+11],
 				           ma[i][j+12],ma[i][j+13],ma[i][j+14],ma[i][j+15]);
 
-			cmpl = _mm_cmplt_epi8(_mm_sub_epi8(vm,vma), vTHETA);	//if( vm - vma < vTHETA)
-			vmFD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),		//if( vm - vma < vTHETA) -> vmFD = 0
-			       _mm_andnot_si128(cmpl, vblanc));			//else -> vmFD = 255
+			cmpl = _mm_cmplt_epi8(_mm_sub_abs_epi8(vm,vma), vTHETA);	//if( |vm - vma| < vTHETA)
+			vmFD = _mm_or_si128(_mm_and_si128(cmpl,vnoir),			//if( |vm - vma| < vTHETA) -> vmFD = 0
+			       _mm_andnot_si128(cmpl, vblanc));				//else -> vmFD = 255
 
 			mFD[i][j+15] = (vmFD[0] >> 0 ) & 255;
 			mFD[i][j+14] = (vmFD[0] >> 8 ) & 255;
@@ -80,7 +96,7 @@ void SEQ_FD(long nrl, long nrh, long ncl, long nch, uint8 **ma, uint8 **m, uint8
 	{
 		for(int j = ncl; j <= nch; j++)
 		{
-			if(m[i][j] - ma[i][j] < THETA)
+			if(abs(m[i][j] - ma[i][j]) < THETA)
 				mFD[i][j] = 0;
 			else
 				mFD[i][j] = 255;
@@ -128,23 +144,18 @@ void SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint8 **
 			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vMSDa,one)),	//else if(vMSDa > vm ) -> vMSD = vMSDa - 1
 			       _mm_andnot_si128(cmpg, vMSDa))));							//else -> vMSD = vMSDa
 
-			vOSD = _mm_sub_epi8(vMSD, vm);
+			vOSD = _mm_sub_abs_epi8(vMSD, vm);
 
 			NvOSD = _mm_add_epi8(vOSD,_mm_add_epi8(vOSD,vOSD));	//NvOSD = N * vOSD = 3 * vOSD
-			cmpl = _mm_cmplt_epi8(vVSDa, NvOSD);	//if(vVSDa < vOSD * 3)
-			cmpg = _mm_cmpgt_epi8(vVSDa, NvOSD);	//if(vVSDa > vOSD * 3)
+			cmpl = _mm_cmplt_epi8(vVSDa, NvOSD);			//if(vVSDa < vOSD * 3)
+			cmpg = _mm_cmpgt_epi8(vVSDa, NvOSD);			//if(vVSDa > vOSD * 3)
 
 			vVSD = _mm_or_si128(_mm_and_si128(cmpl,_mm_add_epi8(vVSDa,one)),				//if(vVSDa < vOSD * vN) -> vVSD = vVSDa + 1
 			       _mm_andnot_si128(cmpl, _mm_or_si128(_mm_and_si128(cmpg, _mm_sub_epi8(vVSDa,one)),	//else if(vVSDa > vOSD * vN) -> vVSD = vVSDa - 1
 			       _mm_andnot_si128(cmpg, vVSDa))));							//else -> vVSD = vVSDa
 
 
-			cmpl = _mm_cmplt_epi8(vVSD, vVmax);		//if(vVSD < vVmax)
-			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVSD),	//if(vVSD < vVmax) -> vVSD = vVSD
-			       _mm_andnot_si128(cmpl, vVmax));		//else -> vVSD = vVmax
-			cmpl = _mm_cmplt_epi8(vVSD, vVmin);		//if(vVSD < vVmin)
-			vVSD = _mm_or_si128(_mm_and_si128(cmpl,vVmin),	//if(vVSD < vVmin) -> vVSD = vVmin
-			       _mm_andnot_si128(cmpl, vVSD));		//else -> vVSD = vVSD
+			vVSD = _mm_MAX_epi8(_mm_MIN_epi8(vVSD,vVmax),vVmin);	
 
 
 			cmpl = _mm_cmplt_epi8(vOSD, vVSD);		//if(vOSD < vVSD)
@@ -222,7 +233,7 @@ void SEQ_SD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **mSD, uint
 			else
 				MSD[i][j] = MSDa[i][j];
 
-			OSD[i][j] = MSD[i][j] - m[i][j];
+			OSD[i][j] = abs(MSD[i][j] - m[i][j]);
 
 			if(VSDa[i][j] < (N * OSD[i][j]))
 				VSD[i][j] = VSDa[i][j] + 1;
@@ -265,7 +276,7 @@ void test_visage()
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
 
-	for (i = 0; i < nb; i++){
+	for (i = 0; i < 8; i++){
 		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
@@ -338,8 +349,8 @@ void Generate_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], 
 				ROC[2]++;	//FP
 			else if(v[i][j] == 0 && m[i][j] == 0)
 				ROC[3]++;	//VN
-			else
-				printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
+			//else
+				//printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
 		}
 	}
 }
