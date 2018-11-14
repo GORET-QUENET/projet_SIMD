@@ -22,6 +22,22 @@ void CopyMatrice_SSE(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8
 }
 
 /*--------------------------------------------------------------------------*/
+void CopyValue_SSE(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val)
+/*--------------------------------------------------------------------------*/
+{
+	vuint8 vdest, vval;
+	vval = _mm_set1_epi8(val);
+	for(int i = nrl; i <= nrh; i++)
+	{
+		for(int j = ncl; j <= nch; j++)
+		{
+			vdest = vval;
+			_mm_storeu_si128((__m128i*)&dest[i][j], vdest);
+		}
+	}
+}
+
+/*--------------------------------------------------------------------------*/
 void Erosion3_SSE(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {

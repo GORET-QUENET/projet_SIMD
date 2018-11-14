@@ -7,6 +7,7 @@
 #define __MORPHO_SSE_H__
 
 void CopyMatrice_SSE(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src);
+void CopyValue_SSE(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val);
 
 void Erosion3_SSE(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp);
 void Erosion5_SSE(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp);
