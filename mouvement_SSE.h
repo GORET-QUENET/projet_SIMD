@@ -6,6 +6,7 @@
 #ifndef __NR_MOUVEMENT_SSE_H__
 #define __NR_MOUVEMENT_SSE_H__
 
+#include "vnrdef.h"
 #define THETA 16
 #define N 3
 #define Vmax 254

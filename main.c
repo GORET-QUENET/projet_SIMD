@@ -15,6 +15,8 @@
 #include "test_morpho_SSE.h"
 #include "ROC.h"
 
+#define NBFRAME 300
+
 //Commandes SSE : https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 
 /**************************************************/
@@ -35,7 +37,7 @@ void test_visage()
 	sprintf(filename,"visage/test.pgm");
 	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
-	for (i = 0; i < 11; i++){
+	for (i = 0; i < 24; i++){
 		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		
@@ -170,6 +172,10 @@ int main(int argc, char **argv)
 		/**********************************/
 		/*   Generation de la matrice m   */
 		/**********************************/
+		char *filename = malloc( 100 * sizeof(char));
+		uint8 ***tm;
+		uint8 ***tmSD;
+		uint8 ***tmFD;
 		uint8 **m;
 		long nrl; 
 		long nrh;
@@ -202,21 +208,48 @@ int main(int argc, char **argv)
 		nch = width - 1;
 
 		m = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
-		
+
+		tm = malloc(NBFRAME * sizeof(uint8**));
+		tmSD = malloc(NBFRAME * sizeof(uint8**));
+		tmFD = malloc(NBFRAME * sizeof(uint8**));
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			tm[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+			sprintf(filename,"hall/hall%06d.pgm", i);
+			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tm[i]);
+		}
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			tmSD[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+			if(i)
+			{
+				sprintf(filename,"SD/hall%06d.pgm", i);
+				MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tmSD[i]);
+			}
+		}
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			tmFD[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
+			if(i)
+			{
+				sprintf(filename,"FD/hall%06d.pgm", i);
+				MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tmFD[i]);
+			}
+		}
 		/**********************************/
 		/* Partie des tests des fonctions */
 		/**********************************/
 
-		test_FD_SEQ(m, nrl, nrh, ncl, nch);
-		test_SD_SEQ(m, nrl, nrh, ncl, nch);
-		test_morpho_FD_SEQ(m, nrl, nrh, ncl, nch);
-		test_morpho_SD_SEQ(m, nrl, nrh, ncl, nch);
-		test_FD_SSE(m, nrl, nrh, ncl, nch);
-		test_SD_SSE(m, nrl, nrh, ncl, nch);
-		test_morpho_FD_SSE(m, nrl, nrh, ncl, nch);
-		test_morpho_SD_SSE(m, nrl, nrh, ncl, nch);
-		test_morpho_FD_THREAD(m, nrl, nrh, ncl, nch);
-		test_morpho_SD_THREAD(m, nrl, nrh, ncl, nch);
+		test_FD_SEQ(tm, nrl, nrh, ncl, nch);
+		test_SD_SEQ(tm, nrl, nrh, ncl, nch);
+		test_morpho_FD_SEQ(tmFD, nrl, nrh, ncl, nch);
+		test_morpho_SD_SEQ(tmSD, nrl, nrh, ncl, nch);
+		test_FD_SSE(tm, nrl, nrh, ncl, nch);
+		test_SD_SSE(tm, nrl, nrh, ncl, nch);
+		test_morpho_FD_SSE(tmFD, nrl, nrh, ncl, nch);
+		test_morpho_SD_SSE(tmSD, nrl, nrh, ncl, nch);
+		test_morpho_FD_THREAD(tmFD, nrl, nrh, ncl, nch);
+		test_morpho_SD_THREAD(tmSD, nrl, nrh, ncl, nch);
 
 	}
 	else
