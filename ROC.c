@@ -35,6 +35,8 @@ void Fill_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], int 
 				printf("Error : grey value detected v=%d, m=%d, step=%d, i=%d, j=%d\n",v[i][j],m[i][j], step, i, j);
 		}
 	}
+	free_ui8matrix(v, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 }
 
 /*---------------------------------------------------------------------------------------*/
@@ -48,6 +50,7 @@ void test_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], char
 		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 		Fill_ROC(m, nrl, nrh, ncl, nch, ROC, step);
 	}
+	free(filename);
 }
 
 
@@ -94,6 +97,8 @@ void test_ROC_morpho_SD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -132,6 +137,8 @@ void test_ROC_morpho_FD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -167,6 +174,8 @@ void test_ROC_morpho_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -204,6 +213,8 @@ void test_ROC_morpho_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -240,6 +251,8 @@ void test_ROC_morpho_SD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -276,7 +289,8 @@ void test_ROC_morpho_FD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
-
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -312,6 +326,9 @@ void test_ROC_FD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(mFD, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(ma, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(mFD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -361,6 +378,13 @@ void test_ROC_SD_SEQ(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(mSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(OSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -395,6 +419,9 @@ void test_ROC_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(mFD, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(ma, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(mFD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -444,6 +471,13 @@ void test_ROC_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}
+	free_ui8matrix(mSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(OSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free(filename);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/

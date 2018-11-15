@@ -33,8 +33,8 @@ void CopyValue(long nrl, long nrh, long ncl, long nch, uint8 **dest, int val)
 
 void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
-	for (uint8 i = nrl; i <= nrh; i++)
-		for (uint8 j = ncl; j <= nch; j++)
+	for (int i = nrl; i <= nrh; i++)
+		for (int j = ncl; j <= nch; j++)
 		{
 			if (m[i][j] == 255)
 				m[i][j] = 0;
@@ -47,9 +47,9 @@ void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			
 void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 {
-        for (uint8 i = nrl; i <= nrh; i++)
+        for (int i = nrl; i <= nrh; i++)
 	{
-                for (uint8 j = ncl; j <= nch; j++)
+                for (int j = ncl; j <= nch; j++)
                                 printf("%d\t", m[i][j]);
 		printf("\n");
 	}

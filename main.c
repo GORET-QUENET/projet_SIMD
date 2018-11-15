@@ -115,7 +115,7 @@ void test_visage()
                         sprintf(filename,"visage/test_ouverture5_THREAD.pgm");
                         break;
 		/********************************/
-		/* Test des morphos avec Thread */
+		/*   Test des morphos avec SSE  */
 		/********************************/
 		case 16:
                         Erosion3_SSE(nrl, nrh, ncl, nch, m, tmp);
@@ -153,7 +153,7 @@ void test_visage()
 		default:
 			return;
 		}	
-		afficher_matrice(m, nrl, nrh, ncl, nch);
+		//afficher_matrice(m, nrl, nrh, ncl, nch);
         	inverser_matrice(m, nrl, nrh, ncl, nch);	
 		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 	}
@@ -176,7 +176,6 @@ int main(int argc, char **argv)
 		uint8 ***tm;
 		uint8 ***tmSD;
 		uint8 ***tmFD;
-		uint8 **m;
 		long nrl; 
 		long nrh;
 		long ncl;
@@ -206,8 +205,6 @@ int main(int argc, char **argv)
 		nrh = height - 1;
 		ncl = 0;
 		nch = width - 1;
-
-		m = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 
 		tm = malloc(NBFRAME * sizeof(uint8**));
 		tmSD = malloc(NBFRAME * sizeof(uint8**));
@@ -250,7 +247,25 @@ int main(int argc, char **argv)
 		test_morpho_SD_SSE(tmSD, nrl, nrh, ncl, nch);
 		test_morpho_FD_THREAD(tmFD, nrl, nrh, ncl, nch);
 		test_morpho_SD_THREAD(tmSD, nrl, nrh, ncl, nch);
+	
 
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			free_ui8matrix(tm[i], nrl - 2, nrh + 2, ncl - 2, nch + 2);
+		}
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			free_ui8matrix(tmSD[i], nrl - 2, nrh + 2, ncl - 2, nch + 2);
+		}
+		for(int i = 0; i < NBFRAME; i++)
+		{
+			free_ui8matrix(tmFD[i], nrl - 2, nrh + 2, ncl - 2, nch + 2);
+		}
+		free(filename);
+		free(buffer);
+		free(tm);
+		free(tmSD);
+		free(tmFD);
 	}
 	else
 	{ // argc > 1, alors MODE TEST SUR VISAGE

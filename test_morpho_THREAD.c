@@ -44,7 +44,7 @@ void test_morpho_SD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch)
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
 	printf("|Pour morpho_SD_THREAD:\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
-
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -85,7 +85,7 @@ void test_morpho_FD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch)
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
 	printf("|Pour morpho_FD_THREAD:\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
-
+	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/

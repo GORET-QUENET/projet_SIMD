@@ -46,7 +46,8 @@ void test_FD_SSE(uint8 ***m, long nrl, long nrh, long ncl, long nch)
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
 	printf("|Pour FD_SSE:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
-
+	free_ui8matrix(ma, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(mFD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
@@ -103,7 +104,12 @@ void test_SD_SSE(uint8 ***m, long nrl, long nrh, long ncl, long nch)
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
 	printf("|Pour SD_SSE:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
-
+	free_ui8matrix(mSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(MSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(OSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
+	free_ui8matrix(VSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	/***********************************/
 	/*         Calcul de la ROC        */
 	/***********************************/
