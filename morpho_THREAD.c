@@ -11,7 +11,7 @@
 void CopyMatrice_parallel(long nrl, long nrh, long ncl, long nch, uint8 **dest, uint8 **src)
 /*----------------------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK)
 	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
@@ -26,7 +26,7 @@ void CopyMatrice_parallel(long nrl, long nrh, long ncl, long nch, uint8 **dest, 
 void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*----------------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
@@ -35,7 +35,7 @@ void Erosion3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
                 }
         }
         CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
-	#pragma omp parallel for schedule(static, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
@@ -58,7 +58,7 @@ void Erosion5_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 
 void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-------------------------------------------------------------------------------------*/
 {
-	#pragma omp parallel for schedule(static, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
@@ -67,7 +67,7 @@ void Dilatation3_parallel(long nrl, long nrh, long ncl, long nch, uint8 **m, uin
                 }
         }
         CopyMatrice_parallel(nrl, nrh, ncl, nch, m, tmp);
-	#pragma omp parallel for schedule(static, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)

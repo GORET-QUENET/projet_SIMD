@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -std=gnu99
 EXEC_NAME = exec
 INCLUDES =
 LIBS =
