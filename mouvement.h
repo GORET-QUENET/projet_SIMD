@@ -6,10 +6,10 @@
 #ifndef __NR_MOUVEMENT_H__
 #define __NR_MOUVEMENT_H__
 
-#define THETA 15
+#define THETA 16
 #define N 3
-#define Vmax 200
-#define Vmin 10
+#define Vmax 254
+#define Vmin 16
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 

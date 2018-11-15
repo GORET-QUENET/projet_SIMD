@@ -9,14 +9,19 @@
 #include "vnrdef.h"
 #include "nrutil.h"
 #include "test_mouvement_SSE.h"
+#include "ROC.h"
 
-
+/*---------------------------------------------------------------*/
 void test_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
+/*---------------------------------------------------------------*/
 {
+	/***********************************/
+	/*         Calcul de la SD         */
+	/***********************************/
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **ma; // matrice t-1
 	uint8 **mFD; // matrice après FD
-
+	int ROC[4] = {0}; //VP, FN, FP, VN
 	ma = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	mFD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	double temps;
@@ -37,6 +42,9 @@ void test_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 		}
 	}
 
+	/***********************************/
+	/*   Calcul des temps de calculs   */
+	/***********************************/
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	for(int step = 0; step < NBFRAME; step++)
 	{
@@ -45,18 +53,30 @@ void test_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);			
 			
-			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
+			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
 	clock_gettime(CLOCK_MONOTONIC, &tfile);
 	temps = (double) (t2.tv_sec - t1.tv_sec - (tfile.tv_sec - t2.tv_sec));
 	temps += (double) (t2.tv_nsec - t1.tv_nsec - (tfile.tv_nsec - t2.tv_nsec))/ 1000000000.0;
-	printf("|Pour FD_SSE:\t\t\t|\n|t = %.3f \t\t\t|\n",temps);
+	printf("|Pour FD_SSE:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+
+	/***********************************/
+	/*         Calcul de la ROC        */
+	/***********************************/
+	test_ROC(m, nrl, nrh, ncl, nch, ROC, "FD");
+	Affiche_ROC(ROC);
 }
 
+
+/*---------------------------------------------------------------*/
 void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
+/*---------------------------------------------------------------*/
 {
+	/***********************************/
+	/*         Calcul de la SD         */
+	/***********************************/
 	char *filename = malloc( 100 * sizeof(char));
 	uint8 **mSD; // matrice après SD
 	uint8 **MSD; // matrice Moyenne
@@ -64,7 +84,7 @@ void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	uint8 **OSD; // matrice différence
 	uint8 **VSD; // matrice Variance V
 	uint8 **VSDa; // matrice variance V à t-1
-
+	int ROC[4] = {0}; //VP, FN, FP, VN
 	mSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	MSD = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	MSDa = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
@@ -95,6 +115,9 @@ void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 		}
 	}
 
+	/***********************************/
+	/*   Calcul des temps de calculs   */
+	/***********************************/
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	for(int step = 0; step < NBFRAME; step++)
 	{
@@ -103,12 +126,18 @@ void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);			
 			
-			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
+			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
 	clock_gettime(CLOCK_MONOTONIC, &tfile);
 	temps = (double) (t2.tv_sec - t1.tv_sec - (tfile.tv_sec - t2.tv_sec));
 	temps += (double) (t2.tv_nsec - t1.tv_nsec - (tfile.tv_nsec - t2.tv_nsec))/ 1000000000.0;
-	printf("|Pour SD_SSE:\t\t\t|\n|t = %.3f \t\t\t|\n",temps);
+	printf("|Pour SD_SSE:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+
+	/***********************************/
+	/*         Calcul de la ROC        */
+	/***********************************/
+	test_ROC(m, nrl, nrh, ncl, nch, ROC, "SD");
+	Affiche_ROC(ROC);
 }

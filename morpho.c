@@ -41,7 +41,7 @@ void inverser_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			else if (m[i][j] == 0)
 				m[i][j] = 255;
 			else
-				printf("Error : grey value detected\n");
+				printf("Error : grey value detected during invert\n");
 		}
 }
 			

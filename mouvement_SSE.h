@@ -6,10 +6,10 @@
 #ifndef __NR_MOUVEMENT_SSE_H__
 #define __NR_MOUVEMENT_SSE_H__
 
-#define THETA 15
+#define THETA 16
 #define N 3
-#define Vmax 200
-#define Vmin 10
+#define Vmax 254
+#define Vmin 16
 
 vuint8 _mm_MAX_epi8(vuint8 a, vuint b);
 vuint8 _mm_MIN_epi8(vuint a, vuint b);
