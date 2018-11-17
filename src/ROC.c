@@ -16,7 +16,7 @@ void Fill_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], int 
 	uint8** v;
 	v = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	char *filename = malloc( 100 * sizeof(char));
-	sprintf(filename,"../verite/hall%06d.pgm", step);
+	sprintf(filename,"verite/hall%06d.pgm", step);
 	MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, v);
 
 	for(int i = nrl; i <= nrh; i++)
@@ -46,7 +46,7 @@ void test_ROC(uint8 **m, long nrl, long nrh, long ncl, long nch, int ROC[], char
 	char *filename = malloc( 100 * sizeof(char));
 	for(int step = 10; step < NBFRAME; step+=10)
 	{
-		sprintf(filename,"../%s/hall%06d.pgm", AlgoName, step);
+		sprintf(filename,"%s/hall%06d.pgm", AlgoName, step);
 		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 		Fill_ROC(m, nrl, nrh, ncl, nch, ROC, step);
 	}

@@ -61,7 +61,7 @@ void afficher_matrice(uint8 **m, long nrl, long nrh, long ncl, long nch)
 void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	/*for(int i = nrl; i <= nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
 		{
@@ -70,8 +70,8 @@ void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			tmp[i][j]&= m[i+1][j-1] & m[i+1][j+0] & m[i+1][j+1];
 		}
 	}
-	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
-        for(int i = nrl; i <= nrh; i++)
+	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        /*for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
                 {
@@ -87,14 +87,14 @@ void Erosion3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
                         tmp[i][j] = m[i][j+1] & m[i][j] & m[i][j-1];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
 }
 
 /*--------------------------------------------------------------------------*/
 void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*--------------------------------------------------------------------------*/
 {
-	/*for(int i = nrl; i <= nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
 		{
@@ -105,16 +105,16 @@ void Erosion5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			tmp[i][j]&= m[i+2][j-2] & m[i+2][j-1] & m[i+2][j+0] & m[i+2][j+1] & m[i+2][j+2];
 		}
 	}
-	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
-	Erosion3(nrl, nrh, ncl, nch, m, tmp);
-	Erosion3(nrl, nrh, ncl, nch, m, tmp);
+	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	/*Erosion3(nrl, nrh, ncl, nch, m, tmp);
+	Erosion3(nrl, nrh, ncl, nch, m, tmp);*/
 }
 
 /*-----------------------------------------------------------------------------*/
 void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	/*for(int i = nrl; i <= nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
 		{
@@ -123,8 +123,8 @@ void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			tmp[i][j]|= m[i+1][j-1] | m[i+1][j+0] | m[i+1][j+1];
 		}
 	}
-	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
-        for(int i = nrl; i <= nrh; i++)
+	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        /*for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j++)
                 {
@@ -140,14 +140,14 @@ void Dilatation3(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
                         tmp[i][j] = m[i][j+1] | m[i][j] | m[i][j-1];
                 }
         }
-        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+        CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
 }
 
 /*-----------------------------------------------------------------------------*/
 void Dilatation5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 /*-----------------------------------------------------------------------------*/
 {
-	/*for(int i = nrl; i <= nrh; i++)
+	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j++)
 		{
@@ -158,9 +158,9 @@ void Dilatation5(long nrl, long nrh, long ncl, long nch, uint8 **m, uint8 **tmp)
 			tmp[i][j]|= m[i+2][j-2] | m[i+2][j-1] | m[i+2][j+0] | m[i+2][j+1] | m[i+2][j+2];
 		}
 	}
-	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);*/
-	Dilatation3(nrl, nrh, ncl, nch, m, tmp);
-	Dilatation3(nrl, nrh, ncl, nch, m, tmp);
+	CopyMatrice(nrl, nrh, ncl, nch, m, tmp);
+	/*Dilatation3(nrl, nrh, ncl, nch, m, tmp);
+	Dilatation3(nrl, nrh, ncl, nch, m, tmp);*/
 }
 
 /*-------------------------------------------------------------------------------*/

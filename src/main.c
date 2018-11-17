@@ -39,11 +39,11 @@ void test_visage()
 	uint8 **tmp;
 	uint8 i;
 	char *filename = malloc( 100 * sizeof(char));
-	sprintf(filename,"../visage/test.pgm");
+	sprintf(filename,"visage/test.pgm");
 	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	for (i = 0; i < 24; i++){
-		sprintf(filename,"../visage/test.pgm");
+		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		
 		inverser_matrice(m, nrl, nrh, ncl, nch);
@@ -54,111 +54,135 @@ void test_visage()
 		/********************************/
 		case 0: 
 			Erosion3(nrl, nrh, ncl, nch, m, tmp);
-			sprintf(filename,"../visage/test_erosion3.pgm");
+			sprintf(filename,"visage/test_erosion3.pgm");
+			printf("Generation de erosion3.pgm\n");
 			break;
 		case 1:
 			Dilatation3(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"../visage/test_dilatation3.pgm");
+                	sprintf(filename,"visage/test_dilatation3.pgm");
+			printf("Generation de dilatation3.pgm\n");
                 	break;
 		case 2:
 			Erosion5(nrl, nrh, ncl, nch, m, tmp);
-                	sprintf(filename,"../visage/test_erosion5.pgm");
+                	sprintf(filename,"visage/test_erosion5.pgm");
+			printf("Generation de erosion5.pgm\n");
                		break;
 		case 3:
 			Dilatation5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_dilatation5.pgm");
+                        sprintf(filename,"visage/test_dilatation5.pgm");
+			printf("Generation de dilatation5.pgm\n");
                         break;
 		case 4:
                         Fermeture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture3.pgm");
+                        sprintf(filename,"visage/test_fermeture3.pgm");
+			printf("Generation de fermeture3.pgm\n");
                         break;
 		case 5:
                         Fermeture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture5.pgm");
+                        sprintf(filename,"visage/test_fermeture5.pgm");
+			printf("Generation de fermeture5.pgm\n");
                         break;
 		case 6:
                         Ouverture3(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture3.pgm");
+                        sprintf(filename,"visage/test_ouverture3.pgm");
+			printf("Generation de ouverture3.pgm\n");
                         break;
 		case 7:
                         Ouverture5(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture5.pgm");
+                        sprintf(filename,"visage/test_ouverture5.pgm");
+			printf("Generation de ouverture5.pgm\n");
                         break;
 		/********************************/
 		/* Test des morphos avec Thread */
 		/********************************/
 		case 8:
                         Erosion3_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_erosion3_THREAD.pgm");
+                        sprintf(filename,"visage/test_erosion3_THREAD.pgm");
+			printf("Generation de erosion3_THREAD.pgm\n");
                         break;
 		case 9:
-			Erosion5_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_erosion5_THREAD.pgm");
+                        Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation3_THREAD.pgm");
+			printf("Generation de dilatation3_THREAD.pgm\n");
                         break;
 		case 10:
-                        Dilatation3_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_dilatation3_THREAD.pgm");
+			Erosion5_parallel(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion5_THREAD.pgm");
+			printf("Generation de erosion5_THREAD.pgm\n");
                         break;
                 case 11:
                         Dilatation5_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_dilatation5_THREAD.pgm");
+                        sprintf(filename,"visage/test_dilatation5_THREAD.pgm");
+			printf("Generation de dilatation5_THREAD.pgm\n");
                         break;
 		case 12:
                         Fermeture3_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture3_THREAD.pgm");
+                        sprintf(filename,"visage/test_fermeture3_THREAD.pgm");
+			printf("Generation de fermeture3_THREAD.pgm\n");
                         break;
                 case 13:
                         Fermeture5_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture5_THREAD.pgm");
+                        sprintf(filename,"visage/test_fermeture5_THREAD.pgm");
+			printf("Generation de fermeture5_THREAD.pgm\n");
                         break;
 		case 14:
                         Ouverture3_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture3_THREAD.pgm");
+                        sprintf(filename,"visage/test_ouverture3_THREAD.pgm");
+			printf("Generation de ouverture3_THREAD.pgm\n");
                         break;
                 case 15:
                         Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture5_THREAD.pgm");
+                        sprintf(filename,"visage/test_ouverture5_THREAD.pgm");
+			printf("Generation de ouverture5_THREAD.pgm\n");
                         break;
 		/********************************/
 		/*   Test des morphos avec SSE  */
 		/********************************/
 		case 16:
                         Erosion3_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_erosion3_SSE2.pgm");
+                        sprintf(filename,"visage/test_erosion3_SSE2.pgm");
+			printf("Generation de erosion3_SSE.pgm\n");
                         break;
 		case 17:
-			Erosion5_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_erosion5_SSE2.pgm");
+                        Dilatation3_SSE(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation3_SSE2.pgm");
+			printf("Generation de dilatation3_SSE.pgm\n");
                         break;
 		case 18:
-                        Dilatation3_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_dilatation3_SSE2.pgm");
+			Erosion5_SSE(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion5_SSE2.pgm");
+			printf("Generation de erosion5_SSE.pgm\n");
                         break;
                 case 19:
                         Dilatation5_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_dilatation5_SSE2.pgm");
+                        sprintf(filename,"visage/test_dilatation5_SSE2.pgm");
+			printf("Generation de dilatation5_SSE.pgm\n");
                         break;
 		case 20:
                         Fermeture3_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture3_SSE2.pgm");
+                        sprintf(filename,"visage/test_fermeture3_SSE2.pgm");
+			printf("Generation de fermeture3_SSE.pgm\n");
                         break;
                 case 21:
                         Fermeture5_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_fermeture5_SSE2.pgm");
+                        sprintf(filename,"visage/test_fermeture5_SSE2.pgm");
+			printf("Generation de fermeture5_SSE.pgm\n");
                         break;
 		case 22:
                         Ouverture3_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture3_SSE2.pgm");
+                        sprintf(filename,"visage/test_ouverture3_SSE2.pgm");
+			printf("Generation de ouverture3_SSE.pgm\n");
                         break;
                 case 23:
                         Ouverture5_SSE(nrl, nrh, ncl, nch, m, tmp);
-                        sprintf(filename,"../visage/test_ouverture5_SSE2.pgm");
+                        sprintf(filename,"visage/test_ouverture5_SSE2.pgm");
+			printf("Generation de ouverture5_SSE.pgm\n");
                         break;
 
 		default:
 			return;
 		}	
-		//afficher_matrice(m, nrl, nrh, ncl, nch);
+		afficher_matrice(m, nrl, nrh, ncl, nch);
         	inverser_matrice(m, nrl, nrh, ncl, nch);	
 		SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 	}
@@ -190,11 +214,9 @@ int main(int argc, char **argv)
 		char *buffer;
 		buffer = (char*) calloc(80, sizeof(char));
 		FILE *file;
-
-		file = fopen("../hall/hall000000.pgm","rb");
-	
+		file = fopen("hall/hall000000.pgm","rb");
 		if (file==NULL)
-			nrerror("ouverture du fichier impossible\n");
+			nrerror("ouverture du fichier impossible\nlancer l'exécutable depuis la racine du projet et non depuis le dossier /exe\n");
 			//nrerror("ouverture du fichier %s impossible\n", filename);
 
 		/* lecture de l'entete du fichier pgm */
@@ -220,7 +242,7 @@ int main(int argc, char **argv)
 		for(int i = 0; i < NBFRAME; i++)
 		{
 			tm[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
-			sprintf(filename,"../hall/hall%06d.pgm", i);
+			sprintf(filename,"hall/hall%06d.pgm", i);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tm[i]);
 		}
 		for(int i = 0; i < NBFRAME; i++)
@@ -228,7 +250,7 @@ int main(int argc, char **argv)
 			tmSD[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 			if(i)
 			{
-				sprintf(filename,"../SD/hall%06d.pgm", i);
+				sprintf(filename,"SD/hall%06d.pgm", i);
 				MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tmSD[i]);
 			}
 		}
@@ -237,11 +259,12 @@ int main(int argc, char **argv)
 			tmFD[i] = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
 			if(i)
 			{
-				sprintf(filename,"../FD/hall%06d.pgm", i);
+				sprintf(filename,"FD/hall%06d.pgm", i);
 				MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, tmFD[i]);
 			}
 		}
 		
+		printf("START\n");
 		/**********************************/
 		/* Partie des tests des fonctions */
 		/**********************************/
@@ -295,11 +318,13 @@ int main(int argc, char **argv)
 		free(tm);
 		free(tmSD);
 		free(tmFD);
+		printf("END\n");
 	}
 	else
 	{ // argc > 1, alors MODE TEST SUR VISAGE
+		printf("START\n");
 		test_visage();
-		printf("end\n");
+		printf("END\n");
 	}
 	
 

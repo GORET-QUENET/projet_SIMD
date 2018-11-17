@@ -27,14 +27,14 @@ void test_FD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 
 	for(int step = 0; step < NBFRAME; step++)
 	{
-		sprintf(filename,"../hall/hall%06d.pgm", step);
+		sprintf(filename,"hall/hall%06d.pgm", step);
 		CopyMatrice_SSE(nrl, nrh, ncl, nch, ma, m);
 		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 
 		if(step > 0)
 		{
 			FD_SSE(nrl, nrh, ncl, nch, ma, m, mFD);
-			sprintf(filename,"../FD/hall%06d.pgm", step);
+			sprintf(filename,"FD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mFD, nrl, nrh, ncl, nch, filename);
 		}
 	}
@@ -73,7 +73,7 @@ void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 
 	for(int step = 0; step < NBFRAME; step++)
 	{
-		sprintf(filename,"../hall/hall%06d.pgm", step);
+		sprintf(filename,"hall/hall%06d.pgm", step);
 		CopyMatrice_SSE(nrl, nrh, ncl, nch, MSDa, MSD);
 		CopyMatrice_SSE(nrl, nrh, ncl, nch, VSDa, VSD);
 		MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
@@ -86,7 +86,7 @@ void test_SD_SSE(uint8 **m, long nrl, long nrh, long ncl, long nch)
 		else
 		{
 			SD_SSE(nrl, nrh, ncl, nch, m, mSD, MSD, MSDa, OSD, VSD, VSDa);
-			sprintf(filename,"../SD/hall%06d.pgm", step);
+			sprintf(filename,"SD/hall%06d.pgm", step);
 			SavePGM_ui8matrix(mSD, nrl, nrh, ncl, nch, filename);
 		}
 	}

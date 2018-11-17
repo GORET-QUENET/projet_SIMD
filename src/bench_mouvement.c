@@ -30,7 +30,7 @@ void bench_FD_SEQ(uint8 ***m, long nrl, long nrh, long ncl, long nch, int NBTEST
 		{			if(step)
 			{
 				CopyMatrice(nrl, nrh, ncl, nch, ma, m[step-1]);
-				SEQ_FD(nrl, nrh, ncl, nch, ma, m[step], mFD);
+				SEQ_FD(nrl, nrh, ncl, nch, ma, m[step], mFD);	//Parcours 1 fois l'image
 			}
 		}
 	}
@@ -41,7 +41,10 @@ void bench_FD_SEQ(uint8 ***m, long nrl, long nrh, long ncl, long nch, int NBTEST
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
-	printf("|Pour FD_SEQ:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+	printf("|Pour FD_SEQ:\t\t\t\t|\n|t = %.3fs pour %d images \t\t|\n",temps, (NBFRAME * NBTESTMAX));
+	long pixel = NBFRAME * NBTESTMAX *nrh * nch * 1;
+	double debit = pixel / temps / 1000000.0;
+	printf("|débit = %.3f Mpixel/s \t\t|\n",debit);
 	free_ui8matrix(ma, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	free_ui8matrix(mFD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 }
@@ -84,7 +87,7 @@ void bench_SD_SEQ(uint8 ***m, long nrl, long nrh, long ncl, long nch, int NBTEST
 			}	
 			else
 			{
-				SEQ_SD(nrl, nrh, ncl, nch, m[step], mSD, MSD, MSDa, OSD, VSD, VSDa);
+				SEQ_SD(nrl, nrh, ncl, nch, m[step], mSD, MSD, MSDa, OSD, VSD, VSDa);	//Parcours 1 fois l'image
 			}
 		}
 	}
@@ -95,7 +98,10 @@ void bench_SD_SEQ(uint8 ***m, long nrl, long nrh, long ncl, long nch, int NBTEST
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
-	printf("|Pour SD_SEQ:\t\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+	printf("|Pour SD_SEQ:\t\t\t\t|\n|t = %.3fs pour %d images \t\t|\n",temps, (NBFRAME * NBTESTMAX));
+	long pixel = NBFRAME * NBTESTMAX *nrh * nch * 1;
+	double debit = pixel / temps / 1000000.0;
+	printf("|débit = %.3f Mpixel/s \t\t|\n",debit);
 	free_ui8matrix(mSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	free_ui8matrix(MSD, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 	free_ui8matrix(MSDa, nrl - 2, nrh + 2, ncl - 2, nch + 2);

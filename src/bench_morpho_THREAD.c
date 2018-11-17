@@ -29,8 +29,8 @@ void bench_morpho_SD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch, 
 		{
 			if(step)
 			{
-				Fermeture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);
-				Ouverture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);
+				Fermeture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);	//Parcours 8 fois l'image
+				Ouverture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);	//Parcours 8 fois l'image
 			}
 		}
 	}
@@ -41,7 +41,10 @@ void bench_morpho_SD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch, 
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
-	printf("|Pour morpho_SD_THREAD:\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+	printf("|Pour morpho_SD_THREAD:\t\t\t|\n|t = %.3fs pour %d images \t\t|\n",temps, (NBFRAME * NBTESTMAX));
+	long pixel = NBFRAME * NBTESTMAX *nrh * nch * 16;
+	double debit = pixel / temps / 1000000.0;
+	printf("|débit = %.3f Mpixel/s \t\t|\n",debit);
 	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 }
 
@@ -65,9 +68,9 @@ void bench_morpho_FD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch, 
 		{
 			if(step)
 			{
-				Fermeture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);
-				Erosion3_parallel(nrl, nrh, ncl, nch, m[step], tmp);
-				Ouverture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);
+				Fermeture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);		//Parcours 8 fois l'image
+				Erosion3_parallel(nrl, nrh, ncl, nch, m[step], tmp);		//Parcours 2 fois l'image
+				Ouverture5_parallel(nrl, nrh, ncl, nch, m[step], tmp);		//Parcours 8 fois l'image
 			}
 		}
 	}
@@ -78,7 +81,10 @@ void bench_morpho_FD_THREAD(uint8 ***m, long nrl, long nrh, long ncl, long nch, 
 	clock_gettime(CLOCK_MONOTONIC, &t2);
 	temps = (double) (t2.tv_sec - t1.tv_sec);
 	temps += (double) (t2.tv_nsec - t1.tv_nsec)/ 1000000000.0;
-	printf("|Pour morpho_FD_THREAD:\t\t\t|\n|t = %.3f \t\t\t\t|\n",temps);
+	printf("|Pour morpho_FD_THREAD:\t\t\t|\n|t = %.3fs pour %d images \t\t|\n",temps, (NBFRAME * NBTESTMAX));
+	long pixel = NBFRAME * NBTESTMAX *nrh * nch * 18;
+	double debit = pixel / temps / 1000000.0;
+	printf("|débit = %.3f Mpixel/s \t\t|\n",debit);
 	free_ui8matrix(tmp, nrl - 2, nrh + 2, ncl - 2, nch + 2);
 }
 

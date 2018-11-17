@@ -28,7 +28,7 @@ void test_morpho_SD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	{
 		if(step)
 		{
-			sprintf(filename,"../SD/hall%06d.pgm", step);
+			sprintf(filename,"SD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 
 
@@ -36,7 +36,7 @@ void test_morpho_SD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
 			
 			
-			sprintf(filename,"../SD+morpho/hall%06d.pgm", step);
+			sprintf(filename,"SD+morpho/hall%06d.pgm", step);
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
@@ -66,7 +66,7 @@ void test_morpho_FD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 	{
 		if(step)
 		{
-			sprintf(filename,"../FD/hall%06d.pgm", step);
+			sprintf(filename,"FD/hall%06d.pgm", step);
 			MLoadPGM_ui8matrix(filename, nrl, nrh, ncl, nch, m);
 
 			Fermeture5_parallel(nrl, nrh, ncl, nch, m, tmp);
@@ -74,7 +74,7 @@ void test_morpho_FD_THREAD(uint8 **m, long nrl, long nrh, long ncl, long nch)
 			Ouverture5_parallel(nrl, nrh, ncl, nch, m, tmp);
 		
 			
-			sprintf(filename,"../FD+morpho/hall%06d.pgm", step);
+			sprintf(filename,"FD+morpho/hall%06d.pgm", step);
 			SavePGM_ui8matrix(m, nrl, nrh, ncl, nch, filename);
 		}
 	}
