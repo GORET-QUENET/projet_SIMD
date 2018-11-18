@@ -63,4 +63,9 @@ depend:
 clean:
 	rm -f $(OBJ)
 	rm -f ${EXE_PATH}/${PRODUCT}
+	rm -f SD/*.pgm
+	rm -f FD/*.pgm
+	rm -f FD+morpho/*.pgm
+	rm -f SD+morpho/*.pgm
+	rm -f visage/test_*.pgm
 
