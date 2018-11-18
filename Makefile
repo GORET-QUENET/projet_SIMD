@@ -12,6 +12,7 @@ SRC_PATH = src
 OBJ_PATH = obj
 EXE_PATH = exe
 INC_PATH = include
+MKDIR_P = mkdir -p
 
 # -- OS ----------
 #OS = MACH_OSX
@@ -47,6 +48,14 @@ PRODUCT   = projet.exe
 # -- src and obj List ----------
 SRC = $(addprefix ${SRC_PATH}/, $(FILE))
 OBJ = $(addprefix ${OBJ_PATH}/, $(addsuffix .o, $(basename $(FILE))))
+
+
+all: directories $(EXE_PATH)/$(PRODUCT)
+
+# -- Generate output folder ---------
+
+directories:
+	${MKDIR_P} ${EXE_PATH} ${OBJ_PATH}
 
 # -- Base rules ----------
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.c
