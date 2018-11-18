@@ -13,6 +13,8 @@ OBJ_PATH = obj
 EXE_PATH = exe
 INC_PATH = include
 MKDIR_P = mkdir -p
+SD_FOLDER = SD SD+morpho
+FD_FOLDER = FD FD+morpho
 
 # -- OS ----------
 #OS = MACH_OSX
@@ -55,7 +57,7 @@ all: directories $(EXE_PATH)/$(PRODUCT)
 # -- Generate output folder ---------
 
 directories:
-	${MKDIR_P} ${EXE_PATH} ${OBJ_PATH}
+	${MKDIR_P} ${EXE_PATH} ${OBJ_PATH} ${SD_FOLDER} ${FD_FOLDER}
 
 # -- Base rules ----------
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.c
