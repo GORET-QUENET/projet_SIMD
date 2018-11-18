@@ -44,7 +44,7 @@ void test_visage()
 	sprintf(filename,"visage/test.pgm");
 	m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 	tmp = ui8matrix(nrl - 2, nrh + 2, ncl - 2, nch + 2);
-	for (i = 0; i < 24; i++){
+	for (i = 0; i < 32; i++){
 		sprintf(filename,"visage/test.pgm");
 		m = LoadPGM_ui8matrix(filename, &nrl, &nrh, &ncl, &nch);
 		
@@ -179,6 +179,49 @@ void test_visage()
                         Ouverture5_SSE(nrl, nrh, ncl, nch, m, tmp);
                         sprintf(filename,"visage/test_ouverture5_SSE2.pgm");
 			printf("Generation de ouverture5_SSE.pgm\n");
+                        break;
+		/*****************************************/
+		/*   Test des morphos avec Thread + SSE  */
+		/*****************************************/
+		case 24:
+                        Erosion3_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion3_SSE2_THREAD.pgm");
+			printf("Generation de erosion3_SSE_THREAD.pgm\n");
+                        break;
+		case 25:
+                        Dilatation3_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation3_SSE2_THREAD.pgm");
+			printf("Generation de dilatation3_SSE_THREAD.pgm\n");
+                        break;
+		case 26:
+			Erosion5_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_erosion5_SSE2_THREAD.pgm");
+			printf("Generation de erosion5_SSE_THREAD.pgm\n");
+                        break;
+                case 27:
+                        Dilatation5_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_dilatation5_SSE2_THREAD.pgm");
+			printf("Generation de dilatation5_SSE_THREAD.pgm\n");
+                        break;
+		case 28:
+                        Fermeture3_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_fermeture3_SSE2_THREAD.pgm");
+			printf("Generation de fermeture3_SSE_THREAD.pgm\n");
+                        break;
+                case 29:
+                        Fermeture5_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_fermeture5_SSE2_THREAD.pgm");
+			printf("Generation de fermeture5_SSE_THREAD.pgm\n");
+                        break;
+		case 30:
+                        Ouverture3_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_ouverture3_SSE2_THREAD.pgm");
+			printf("Generation de ouverture3_SSE_THREAD.pgm\n");
+                        break;
+                case 31:
+                        Ouverture5_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
+                        sprintf(filename,"visage/test_ouverture5_SSE2_THREAD.pgm");
+			printf("Generation de ouverture5_SSE_THREAD.pgm\n");
                         break;
 
 		default:

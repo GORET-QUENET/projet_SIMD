@@ -12,7 +12,7 @@ void CopyMatrice_SSE_THREAD(long nrl, long nrh, long ncl, long nch, uint8 **dest
 /*--------------------------------------------------------------------------------*/
 {
 	vuint8 vdest, vsrc;
-	#pragma omp parallel for schedule(dynamic, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK) private(vdest, vsrc)
 	for(int i = nrl; i <= nrh; i++)
 	{
 		for(int j = ncl; j <= nch; j+=16)
@@ -29,7 +29,7 @@ void Erosion3_SSE_THREAD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint
 /*--------------------------------------------------------------------------*/
 {
 	vuint8 vm1,vm2,vm3, vtmp;
-	#pragma omp parallel for schedule(dynamic, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK) private(vm1,vm2,vm3, vtmp)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j+=16)
@@ -42,7 +42,7 @@ void Erosion3_SSE_THREAD(long nrl, long nrh, long ncl, long nch, uint8 **m, uint
                 }
         }
         CopyMatrice_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
-	#pragma omp parallel for schedule(dynamic, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK) private(vm1,vm2,vm3, vtmp)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j+=16)
@@ -70,7 +70,7 @@ void Dilatation3_SSE_THREAD(long nrl, long nrh, long ncl, long nch, uint8 **m, u
 /*--------------------------------------------------------------------------*/
 {
 	vuint8 vm1,vm2,vm3, vtmp;
-	#pragma omp parallel for schedule(dynamic, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK) private(vm1,vm2,vm3, vtmp)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j+=16)
@@ -83,7 +83,7 @@ void Dilatation3_SSE_THREAD(long nrl, long nrh, long ncl, long nch, uint8 **m, u
                 }
         }
         CopyMatrice_SSE_THREAD(nrl, nrh, ncl, nch, m, tmp);
-	#pragma omp parallel for schedule(dynamic, CHUNK)
+	#pragma omp parallel for schedule(dynamic, CHUNK) private(vm1,vm2,vm3, vtmp)
         for(int i = nrl; i <= nrh; i++)
         {
                 for(int j = ncl; j <= nch; j+=16)
