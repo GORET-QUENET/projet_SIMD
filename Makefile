@@ -5,7 +5,7 @@
 # Copyright (c) 2000-2007 Lionel Lacassagne
 
 # -- Lile list ----------
-FILE = main.c nrutil.c mouvement.c mouvement_SSE.c morpho.c morpho_SSE.c morpho_THREAD.c ROC.c bench_mouvement.c bench_mouvement_SSE.c bench_morpho.c bench_morpho_SSE.c bench_morpho_THREAD.c test_mouvement.c test_mouvement_SSE.c test_morpho.c test_morpho_SSE.c test_morpho_THREAD.c
+FILE = main.c nrutil.c mouvement.c mouvement_SSE.c morpho.c morpho_SSE.c morpho_THREAD.c morpho_SSE_THREAD.c ROC.c bench_mouvement.c bench_mouvement_SSE.c bench_morpho.c bench_morpho_SSE.c bench_morpho_THREAD.c bench_morpho_SSE_THREAD.c test_mouvement.c test_mouvement_SSE.c test_morpho.c test_morpho_SSE.c test_morpho_THREAD.c test_morpho_SSE_THREAD.c
 
 # -- Paths ----------
 SRC_PATH = src

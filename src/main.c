@@ -18,6 +18,8 @@
 #include "bench_morpho_THREAD.h"
 #include "test_morpho_SSE.h"
 #include "bench_morpho_SSE.h"
+#include "test_morpho_SSE_THREAD.h"
+#include "bench_morpho_SSE_THREAD.h"
 #include "ROC.h"
 
 #define NBFRAME 300
@@ -354,6 +356,12 @@ int main(int argc, char **argv)
 
 		bench_morpho_SD_THREAD(tmSD, nrl, nrh, ncl, nch, 10);
 		test_morpho_SD_THREAD(m, nrl, nrh, ncl, nch);
+
+		bench_morpho_FD_SSE_THREAD(tmSD, nrl, nrh, ncl, nch, 10);
+		test_morpho_FD_SSE_THREAD(m, nrl, nrh, ncl, nch);
+
+		bench_morpho_SD_SSE_THREAD(tmSD, nrl, nrh, ncl, nch, 10);
+		test_morpho_SD_SSE_THREAD(m, nrl, nrh, ncl, nch);
 	
 
 		for(int i = 0; i < NBFRAME; i++)
